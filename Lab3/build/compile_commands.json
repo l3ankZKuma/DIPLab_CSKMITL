@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build",
+  "command": "clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab3.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/Main.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/Main.cpp",
+  "output": "CMakeFiles/Lab3.dir/Main.cpp.o"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build",
+  "command": "clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab3.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/src/ImageManager.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/src/ImageManager.cpp",
+  "output": "CMakeFiles/Lab3.dir/src/ImageManager.cpp.o"
+}
+]
