@@ -1,6 +1,6 @@
 #include "ImageManager.h"
 
-#define PATH_IMAGES "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/images/"
+#define PATH_IMAGES "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/images/"
 
 int main() 
 {
@@ -11,22 +11,44 @@ int main()
 
         imgr->write(PATH_IMAGES"out.bmp");
 
+        imgr->adjustBrightness(0);
+        imgr->write(PATH_IMAGES"adjbright_mandril.bmp");
+        imgr->restoreToOriginal();
+
+        imgr->invert();
+        imgr->write(PATH_IMAGES"invert_mandril.bmp");
+        imgr->restoreToOriginal();
+
+        int *data = imgr->getGrayscaleHistogram();
+        imgr->writeHistogramToCSV(data,PATH_IMAGES"histogram.csv");
+
+
         
-        imgr->convertToRed();
-        imgr->write(PATH_IMAGES"mandril_red.bmp");
+
+
+        imgr->adjustContrast(-100);
+        imgr->write(PATH_IMAGES"mandril_constrastNeg100.bmp");
         imgr->restoreToOriginal();
 
-        imgr->convertToGreen();
-        imgr->write(PATH_IMAGES"mandril_green.bmp");
+        imgr->adjustContrast(100);
+        imgr->write(PATH_IMAGES"mandril_constrast100.bmp");
         imgr->restoreToOriginal();
 
-        imgr->convertToBlue();
-        imgr->write(PATH_IMAGES"mandril_blue.bmp");
+        // Adjust gamma to 2.2
+        imgr->adjustGamma(2.2);
+        imgr->write(PATH_IMAGES "mandril_gamma2.2.bmp");
         imgr->restoreToOriginal();
 
-        imgr->convertToGrayscale();
-        imgr->write(PATH_IMAGES"mandril_gray.bmp");
+        // Adjust gamma to 0.4
+        imgr->adjustGamma(0.4);
+        imgr->write(PATH_IMAGES "mandril_gamma0.4.bmp");
         imgr->restoreToOriginal();
+
+
+        delete data;
+
+        
+
 
     }
 

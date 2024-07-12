@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/Main.cpp" "CMakeFiles/Lab2.dir/Main.cpp.o" "gcc" "CMakeFiles/Lab2.dir/Main.cpp.o.d"
-  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/src/ImageManager.cpp" "CMakeFiles/Lab2.dir/src/ImageManager.cpp.o" "gcc" "CMakeFiles/Lab2.dir/src/ImageManager.cpp.o.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/Main.cpp" "CMakeFiles/Lab3.dir/Main.cpp.o" "gcc" "CMakeFiles/Lab3.dir/Main.cpp.o.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/src/ImageManager.cpp" "CMakeFiles/Lab3.dir/src/ImageManager.cpp.o" "gcc" "CMakeFiles/Lab3.dir/src/ImageManager.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

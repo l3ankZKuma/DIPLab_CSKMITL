@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Set the project name
-project(Lab2)
+project(Lab3)
 
 # Set the C++ standard and specify the compiler
 set(CMAKE_CXX_STANDARD 20)
@@ -12,15 +12,15 @@ set(CMAKE_CXX_COMPILER clang++)
 set(IMAGES_DIR "${CMAKE_SOURCE_DIR}/images")
 
 # Add the executable
-add_executable(Lab2
+add_executable(Lab3
     Main.cpp
     src/ImageManager.cpp
 )
 
 # Include directories
-target_include_directories(Lab2 PRIVATE src)
+target_include_directories(Lab3 PRIVATE src)
 
 # Add compile definitions
-target_compile_definitions(Lab2 PRIVATE
+target_compile_definitions(Lab3 PRIVATE
     IMAGES_DIR="${IMAGES_DIR}"
 )

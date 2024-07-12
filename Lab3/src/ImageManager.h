@@ -7,7 +7,9 @@
 
 #include <iostream>
 #include <cstdio>
-
+#include <fstream>
+#include<cmath>
+#include<algorithm>
 
 class ImageManager 
 {
@@ -26,7 +28,14 @@ class ImageManager
         void restoreToOriginal()noexcept;
         [[nodiscard]]int getRGB(int x, int y)noexcept;
         void setRGB(int x, int y, int color)noexcept;
-
+        void adjustBrightness(int brightness) noexcept;
+        void invert() noexcept;
+        [[nodiscard]]int * getGrayscaleHistogram() noexcept;
+        void writeHistogramToCSV(int* histogram, const char* fileName) noexcept;
+        [[nodiscard]] float getContrast() noexcept;
+        void adjustContrast(int contrast) noexcept;
+        void adjustGamma(float gamma) noexcept;
+ 
 
     public:
 

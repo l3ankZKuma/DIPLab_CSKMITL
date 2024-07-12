@@ -1,3 +1,3 @@
-/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build/CMakeFiles/Lab2.dir
-/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build/CMakeFiles/edit_cache.dir
-/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build/CMakeFiles/rebuild_cache.dir
+/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build/CMakeFiles/Lab3.dir
+/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build/CMakeFiles/edit_cache.dir
+/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build/CMakeFiles/rebuild_cache.dir

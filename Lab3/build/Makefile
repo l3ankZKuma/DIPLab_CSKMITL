@@ -57,10 +57,10 @@ RM = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2
+CMAKE_SOURCE_DIR = /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build
+CMAKE_BINARY_DIR = /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build/CMakeFiles /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build/CMakeFiles /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab2/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab3/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,24 +117,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Lab2
+# Target rules for targets named Lab3
 
 # Build rule for target.
-Lab2: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Lab2
-.PHONY : Lab2
+Lab3: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Lab3
+.PHONY : Lab3
 
 # fast build rule for target.
-Lab2/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/build
-.PHONY : Lab2/fast
+Lab3/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/build
+.PHONY : Lab3/fast
 
 Main.o: Main.cpp.o
 .PHONY : Main.o
 
 # target to build an object file
 Main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/Main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/Main.cpp.o
 .PHONY : Main.cpp.o
 
 Main.i: Main.cpp.i
@@ -142,7 +142,7 @@ Main.i: Main.cpp.i
 
 # target to preprocess a source file
 Main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/Main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/Main.cpp.i
 .PHONY : Main.cpp.i
 
 Main.s: Main.cpp.s
@@ -150,7 +150,7 @@ Main.s: Main.cpp.s
 
 # target to generate assembly for a file
 Main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/Main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/Main.cpp.s
 .PHONY : Main.cpp.s
 
 src/ImageManager.o: src/ImageManager.cpp.o
@@ -158,7 +158,7 @@ src/ImageManager.o: src/ImageManager.cpp.o
 
 # target to build an object file
 src/ImageManager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/src/ImageManager.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/src/ImageManager.cpp.o
 .PHONY : src/ImageManager.cpp.o
 
 src/ImageManager.i: src/ImageManager.cpp.i
@@ -166,7 +166,7 @@ src/ImageManager.i: src/ImageManager.cpp.i
 
 # target to preprocess a source file
 src/ImageManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/src/ImageManager.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/src/ImageManager.cpp.i
 .PHONY : src/ImageManager.cpp.i
 
 src/ImageManager.s: src/ImageManager.cpp.s
@@ -174,7 +174,7 @@ src/ImageManager.s: src/ImageManager.cpp.s
 
 # target to generate assembly for a file
 src/ImageManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab2.dir/build.make CMakeFiles/Lab2.dir/src/ImageManager.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab3.dir/build.make CMakeFiles/Lab3.dir/src/ImageManager.cpp.s
 .PHONY : src/ImageManager.cpp.s
 
 # Help Target
@@ -185,7 +185,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Lab2"
+	@echo "... Lab3"
 	@echo "... Main.o"
 	@echo "... Main.i"
 	@echo "... Main.s"
