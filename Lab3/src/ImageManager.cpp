@@ -358,3 +358,27 @@ void ImageManager::adjustGamma(float gamma) noexcept
         }
     }
 }
+
+void ImageManager::setTemperature(int rTemp, int gTemp, int bTemp) noexcept {
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            int color = getRGB(i, j);
+            
+            // Extract the RGB components from the color
+            int r = (color >> 16) & 0xFF;
+            int g = (color >> 8) & 0xFF;
+            int b = color & 0xFF;
+            
+            // Adjust the temperature
+            r = std::clamp(r + rTemp, 0, 255);
+            g = std::clamp(g + gTemp, 0, 255);
+            b = std::clamp(b + bTemp, 0, 255);
+            
+            // Combine the new RGB components back into a single color value
+            int newColor = (r << 16) | (g << 8) | b;
+            
+            // Set the new color to the pixel
+            setRGB(i, j, newColor);
+        }
+    }
+}

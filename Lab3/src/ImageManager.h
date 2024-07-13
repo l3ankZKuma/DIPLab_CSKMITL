@@ -35,6 +35,7 @@ class ImageManager
         [[nodiscard]] float getContrast() noexcept;
         void adjustContrast(int contrast) noexcept;
         void adjustGamma(float gamma) noexcept;
+        void setTemperature(int rTemp,int gTemp,int bTemp) noexcept;
  
 
     public:
