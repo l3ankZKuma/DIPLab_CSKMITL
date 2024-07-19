@@ -1,5 +1,4 @@
 #include "ImageManager.h"
-#include <fstream>
 
 ImageManager::ImageManager()noexcept
 {
@@ -383,11 +382,18 @@ void ImageManager::setTemperature(int rTemp, int gTemp, int bTemp) noexcept {
     }
 }
 
-void ImageManager::averagingFilter(int size) noexcept{
-    if (size % 2 == 0) {
-        std::cout << "Size Invalid: must be an odd number!" << std::endl;
-        return;
-    }
+constexpr int clamp(int value, int min, int max) {
+    return value < min ? min : (value > max ? max : value);
+}
+
+template<int Size>
+constexpr bool is_odd() {
+    return Size % 2 == 1;
+}
+
+template<int Size>
+void ImageManager::averagingFilter() noexcept {
+    static_assert(is_odd<Size>(), "Size must be an odd number!");
 
     int *tempBuf = new int[height * width];
 
@@ -395,8 +401,8 @@ void ImageManager::averagingFilter(int size) noexcept{
         for (int x = 0; x < width; x++) {
             int sumRed = 0, sumGreen = 0, sumBlue = 0;
 
-            for (int i = y - size / 2; i <= y + size / 2; i++) {
-                for (int j = x - size / 2; j <= x + size / 2; j++) {
+            for (int i = y - Size / 2; i <= y + Size / 2; i++) {
+                for (int j = x - Size / 2; j <= x + Size / 2; j++) {
                     if (i >= 0 && i < height && j >= 0 && j < width) {
                         int color = getRGB(j, i);
                         int r = (color >> 16) & 0xff;
@@ -409,14 +415,14 @@ void ImageManager::averagingFilter(int size) noexcept{
                 }
             }
 
-            sumRed /= (size * size);
-            sumRed = std::min(255, std::max(0, sumRed));
+            sumRed /= (Size * Size);
+            sumRed = clamp(sumRed, 0, 255);
 
-            sumGreen /= (size * size);
-            sumGreen = std::min(255, std::max(0, sumGreen));
+            sumGreen /= (Size * Size);
+            sumGreen = clamp(sumGreen, 0, 255);
 
-            sumBlue /= (size * size);
-            sumBlue = std::min(255, std::max(0, sumBlue));
+            sumBlue /= (Size * Size);
+            sumBlue = clamp(sumBlue, 0, 255);
 
             int newColor = (sumRed << 16) | (sumGreen << 8) | sumBlue;
             tempBuf[y * width + x] = newColor;
@@ -431,3 +437,117 @@ void ImageManager::averagingFilter(int size) noexcept{
 
     delete[] tempBuf;
 }
+
+template<int Size>
+void ImageManager::medianFilter() noexcept {
+    static_assert(is_odd<Size>(), "Size must be an odd number!");
+
+    int *tempBuf = new int[height * width];
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            std::array<int, Size * Size> reds, greens, blues;
+            int index = 0;
+
+            for (int i = y - Size / 2; i <= y + Size / 2; i++) {
+                for (int j = x - Size / 2; j <= x + Size / 2; j++) {
+                    if (i >= 0 && i < height && j >= 0 && j < width) {
+                        int color = getRGB(j, i);
+                        int r = (color >> 16) & 0xff;
+                        int g = (color >> 8) & 0xff;
+                        int b = color & 0xff;
+                        reds[index] = r;
+                        greens[index] = g;
+                        blues[index] = b;
+                        index++;
+                    }
+                }
+            }
+
+            std::sort(reds.begin(), reds.begin() + index);
+            std::sort(greens.begin(), greens.begin() + index);
+            std::sort(blues.begin(), blues.begin() + index);
+
+            int newColor = (reds[index / 2] << 16) | (greens[index / 2] << 8) | blues[index / 2];
+            tempBuf[y * width + x] = newColor;
+        }
+    }
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            setRGB(x, y, tempBuf[y * width + x]);
+        }
+    }
+
+    delete[] tempBuf;
+}
+
+
+template<int K, int Size>
+void ImageManager::unsharpMasking() noexcept{
+    static_assert(is_odd<Size>(), "Size must be an odd number!");
+
+    int *tempBuf = new int[height * width];
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int sumRed = 0, sumGreen = 0, sumBlue = 0;
+
+            for (int i = y - Size / 2; i <= y + Size / 2; i++) {
+                for (int j = x - Size / 2; j <= x + Size / 2; j++) {
+                    if (i >= 0 && i < height && j >= 0 && j < width) {
+                        int color = getRGB(j, i);
+                        int r = (color >> 16) & 0xff;
+                        int g = (color >> 8) & 0xff;
+                        int b = color & 0xff;
+                        sumRed += r;
+                        sumGreen += g;
+                        sumBlue += b;
+                    }
+                }
+            }
+
+            sumRed /= (Size * Size);
+            sumRed = clamp(sumRed, 0, 255);
+
+            sumGreen /= (Size * Size);
+            sumGreen = clamp(sumGreen, 0, 255);
+
+            sumBlue /= (Size * Size);
+            sumBlue = clamp(sumBlue, 0, 255);
+
+            int color = getRGB(x, y);
+            int r = (color >> 16) & 0xff;
+            int g = (color >> 8) & 0xff;
+            int b = color & 0xff;
+
+            int newR = r + K * (r - sumRed);
+            newR = clamp(newR, 0, 255);
+
+            int newG = g + K * (g - sumGreen);
+            newG = clamp(newG, 0, 255);
+
+            int newB = b + K * (b - sumBlue);
+            newB = clamp(newB, 0, 255);
+
+            int newColor = (newR << 16) | (newG << 8) | newB;
+            tempBuf[y * width + x] = newColor;
+        }
+    }
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            setRGB(x, y, tempBuf[y * width + x]);
+        }
+    }
+    
+}
+
+// Explicit template instantiations
+template void ImageManager::averagingFilter<3>();
+template void ImageManager::averagingFilter<7>();
+template void ImageManager::averagingFilter<15>();
+template void ImageManager::medianFilter<3>();
+template void ImageManager::medianFilter<7>();
+template void ImageManager::medianFilter<15>();
+template void ImageManager::unsharpMasking<1, 3>();

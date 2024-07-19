@@ -9,7 +9,10 @@
 #include <cstdio>
 #include <fstream>
 #include<cmath>
+#include <fstream>
 #include<algorithm>
+#include <vector>
+#include<cassert>
 
 class ImageManager 
 {
@@ -36,7 +39,15 @@ class ImageManager
         void adjustContrast(int contrast) noexcept;
         void adjustGamma(float gamma) noexcept;
         void setTemperature(int rTemp,int gTemp,int bTemp) noexcept;
-        void averagingFilter(int size) noexcept;
+        
+        template<int size>
+        void averagingFilter() noexcept;
+
+        template<int size>
+        void medianFilter() noexcept;
+
+        template<int k,int size>
+        void unsharpMasking() noexcept;
 
     public:
 
