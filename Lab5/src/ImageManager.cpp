@@ -1,553 +1,282 @@
-#include"ImageManager.h"
+#include "ImageManager.h"
 
-ImageManager::ImageManager()noexcept
-{
-    header = new unsigned char[BMP_HEADER_SIZE];
-    colorTable = new unsigned char[BMP_COLOR_TABLE_SIZE];
-    buf = nullptr;
-    original = nullptr;
+
+
+
+void ImageSystem::initImage(Image& img) noexcept {
+    img.header = new uint8_t[BMP_HEADER_SIZE];
+    img.colorTable = new uint8_t[BMP_COLOR_TABLE_SIZE];
+    img.buf = nullptr;
+    img.original = nullptr;
 }
 
-ImageManager::~ImageManager()noexcept
-{
-    delete[] header;
-    delete[] colorTable;
-    delete[] buf;
-    delete[] original;
+
+void ImageSystem::destroyImage(Image& img) noexcept {
+    delete[] img.header;
+    delete[] img.colorTable;
+    delete[] img.buf;
+    delete[] img.original;
 }
 
-bool ImageManager::read(const char* fileName) noexcept
-{
-    FILE* fi = fopen(fileName, "rb");
-    if (fi == nullptr)
-    {
+
+bool ImageSystem::readImage(Image& img, std::string_view fileName) noexcept {
+    FILE* fi = fopen(fileName.data(), "rb");
+    if (fi == nullptr) {
         std::cout << "Unable to open file" << '\n';
         return false;
     }
-    fread(header, sizeof(uint8_t), BMP_HEADER_SIZE, fi);
+    fread(img.header, sizeof(uint8_t), BMP_HEADER_SIZE, fi);
 
-    width = *reinterpret_cast<int*>(&header[18]);
-    height = *reinterpret_cast<int*>(&header[22]);
-    bitDepth = *reinterpret_cast<int*>(&header[28]);
+    img.width = *reinterpret_cast<int*>(&img.header[18]);
+    img.height = *reinterpret_cast<int*>(&img.header[22]);
+    img.bitDepth = *reinterpret_cast<int*>(&img.header[28]);
 
-    if (bitDepth <= 8)
-    {
-        fread(colorTable, sizeof(uint8_t), BMP_COLOR_TABLE_SIZE, fi);
+    if (img.bitDepth <= 8) {
+        fread(img.colorTable, sizeof(uint8_t), BMP_COLOR_TABLE_SIZE, fi);
     }
 
-    buf = new uint8_t[height * width * (bitDepth / BYTE)];
-    fread(buf, sizeof(uint8_t), height * width * (bitDepth / BYTE), fi);
-    
-    original = new uint8_t[height * width * (bitDepth / BYTE)];
-    for (int i = 0; i < (height * width * (bitDepth / BYTE)); i++)
-    {
-        original[i] = buf[i];
+    img.buf = new uint8_t[img.height * img.width * (img.bitDepth / BYTE)];
+    fread(img.buf, sizeof(uint8_t), img.height * img.width * (img.bitDepth / BYTE), fi);
+
+    img.original = new uint8_t[img.height * img.width * (img.bitDepth / BYTE)];
+    for (int i = 0; i < (img.height * img.width * (img.bitDepth / BYTE)); i++) {
+        img.original[i] = img.buf[i];
     }
-    
-    std::cout << "Image " << fileName << " with " << width << " x " << height << " pixels (" << bitDepth << " bits per pixel) has been read!" << std::endl;
+
+    std::cout << "Image " << fileName << " with " << img.width << " x " << img.height << " pixels (" << img.bitDepth << " bits per pixel) has been read!" << std::endl;
     fclose(fi);
     return true;
 }
 
-bool ImageManager::write(const char* fileName) noexcept
-{
-    FILE* fo = fopen(fileName, "wb");
-    if (fo == nullptr)
-    {
+bool ImageSystem::writeImage(const Image& img,std::string_view fileName) noexcept {
+
+    FILE* fo = fopen(fileName.data(), "wb");
+    if (fo == nullptr) {
         std::cout << "Unable to create file" << std::endl;
         return false;
     }
-    fwrite(header, sizeof(unsigned char), BMP_HEADER_SIZE, fo);
-    
-    if (bitDepth <= 8)
-    {
-        fwrite(colorTable, sizeof(unsigned char), BMP_COLOR_TABLE_SIZE, fo);
+    fwrite(img.header, sizeof(uint8_t), BMP_HEADER_SIZE, fo);
+
+    if (img.bitDepth <= 8) {
+        fwrite(img.colorTable, sizeof(uint8_t), BMP_COLOR_TABLE_SIZE, fo);
     }
-    fwrite(buf, sizeof(unsigned char), height * width * (bitDepth / BYTE), fo);
+    fwrite(img.buf, sizeof(uint8_t), img.height * img.width * (img.bitDepth / BYTE), fo);
     std::cout << "Image " << fileName << " has been written!" << std::endl;
     fclose(fo);
     return true;
 }
 
-int ImageManager::getRGB(int x, int y) noexcept
-{
-    int i = y * width * (bitDepth / BYTE) + x * (bitDepth / BYTE);
-    int b = buf[i];
-    int g = buf[i + 1];
-    int r = buf[i + 2];
 
-    int color = (r << 16) | (g << 8) | b;
-    return color;
-}
-
-void ImageManager::setRGB(int x, int y, int color) noexcept
-{
-    int r = (color >> 16) & 0xff;
-    int g = (color >> 8) & 0xff;
-    int b = color & 0xff;
-
-    int i = y * width * (bitDepth / BYTE) + x * (bitDepth / BYTE);
-    buf[i] = b;
-    buf[i + 1] = g;
-    buf[i + 2] = r;
-}
-
-void ImageManager::convertToRed() noexcept
-{
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int r = (color >> 16) & 0xff;
-            color = (r << 16) | 0 | 0;
-            setRGB(x, y, color);
-        }
-    }
-}
-
-void ImageManager::convertToGreen() noexcept
-{
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int g = (color >> 8) & 0xff;
-            color = 0 | (g << 8) | 0;
-            setRGB(x, y, color);
-        }
-    }
-}
-
-void ImageManager::convertToBlue() noexcept
-{
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int b = color & 0xff;
-            color = (0 << 16) | (0 << 8) | b;
-            setRGB(x, y, color);
-        }
-    }
-}
-
-void ImageManager::convertToGrayscale() noexcept
-{
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            uint32_t color = getRGB(x, y);
-            uint32_t r = (color >> 16) & 0xff;
-            uint32_t g = (color >> 8) & 0xff;
-            uint32_t b = color & 0xff;
-            uint32_t gray = (r + g + b) / 3;
-            color = (gray << 16) | (gray << 8) | gray;
-            setRGB(x, y, color);
-        }
-    }
-}
-
-void ImageManager::restoreToOriginal() noexcept
-{
-    for (int i = 0; i < (height * width * (bitDepth / BYTE)); i++)
-    {
-        buf[i] = original[i];
+void ImageSystem::convertToRed(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width; ++i) {
+        img.buf[i * 3 + 1] = 0;
+        img.buf[i * 3 + 2] = 0;
     }
 }
 
 
-void ImageManager::adjustBrightness(int brightness) noexcept
-{
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = color & 0xff;
-            r = r + brightness;
-            r = r > 255? 255: r;
-            r = r < 0? 0: r;
-            g = g + brightness;
-            g = g > 255? 255: g;
-            g = g < 0? 0: g;
-            b = b + brightness;
-            b = b > 255? 255: b;
-            b = b < 0? 0: b;
-            color = (r << 16) | (g << 8) | b;
-            setRGB(x, y, color);
-        }
+void ImageSystem::convertToGreen(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width; ++i) {
+        img.buf[i * 3] = 0;
+        img.buf[i * 3 + 2] = 0;
     }
 }
 
-void ImageManager::invert() noexcept
-{
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = color & 0xff;
-            r = 255 - r;
-            g = 255 - g;
-            b = 255 - b;
-            color = (r << 16) | (g << 8) | b;
-            setRGB(x, y, color);
-        }
+
+void ImageSystem::convertToBlue(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width; ++i) {
+        img.buf[i * 3] = 0;
+        img.buf[i * 3 + 1] = 0;
     }
 }
 
-int* ImageManager::getGrayscaleHistogram() noexcept
-{
-    convertToGrayscale();
-    int* histogram = new int[256];
-    for (int i = 0; i < 256; i++)
-    {
-        histogram[i] = 0;
-        }
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int gray = color & 0xff;
-            histogram[gray]++;
+
+void ImageSystem::convertToGrayscale(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width; ++i) {
+        uint8_t gray = 0.3 * img.buf[i * 3] + 0.59 * img.buf[i * 3 + 1] + 0.11 * img.buf[i * 3 + 2];
+        img.buf[i * 3] = gray;
+        img.buf[i * 3 + 1] = gray;
+        img.buf[i * 3 + 2] = gray;
     }
+}
+
+
+void ImageSystem::restoreToOriginal(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width * (img.bitDepth / BYTE); ++i) {
+        img.buf[i] = img.original[i];
     }
-    restoreToOriginal();
+}
+
+int ImageSystem::getRGB(const Image& img,int x,int y) noexcept {
+    int index = (y * img.width + x) * 3;
+    return (img.buf[index] << 16) | (img.buf[index + 1] << 8) | img.buf[index + 2];
+}
+
+
+void ImageSystem::setRGB(Image& img,int x,int y,int color) noexcept {
+    int index = (y * img.width + x) * 3;
+    img.buf[index] = (color >> 16) & 0xFF;
+    img.buf[index + 1] = (color >> 8) & 0xFF;
+    img.buf[index + 2] = color & 0xFF;
+}
+
+template<int brightness>
+void ImageSystem::adjustBrightness(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width * 3; ++i) {
+        int value = img.buf[i] + brightness;
+        img.buf[i] = std::max(0, std::min(255, value));
+    }
+}
+
+void ImageSystem::invert(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width * 3; ++i) {
+        img.buf[i] = 255 - img.buf[i];
+    }
+}
+
+
+int* ImageSystem::getGrayscaleHistogram(const Image& img) noexcept {
+    int* histogram = new int[256]();
+    for (uint32_t i = 0; i < img.height * img.width; ++i) {
+        int gray = 0.3 * img.buf[i * 3] + 0.59 * img.buf[i * 3 + 1] + 0.11 * img.buf[i * 3 + 2];
+        histogram[gray]++;
+    }
     return histogram;
 }
 
-void ImageManager::writeHistogramToCSV(int* histogram, const char* fileName) noexcept
-{
-    std::ofstream fo;
-    fo.open (fileName);
-    for (int i = 0; i < 256; i++)
-    {
-    fo << histogram[i] << ",";
+
+void ImageSystem::writeHistogramToCSV(std::string_view src,std::string_view dest) noexcept {
+    FILE* fo = fopen(dest.data(), "w");
+    if (fo == nullptr) {
+        std::cout << "Unable to create file" << '\n';
+        return;
     }
-    fo.close();
-}
-
-float ImageManager::getContrast() noexcept
-{
-    float contrast = 0;
-
-    int* histogram = getGrayscaleHistogram();
-    float avgIntensity = 0;
-    float pixelNum = width * height;
-
-    for (int i = 0; i < 256; i++)
-    {
-        avgIntensity += histogram[i] * i;
+    for (int i = 0; i < 256; ++i) {
+        fprintf(fo, "%d,%d\n", i, src.at(i));
     }
-
-    avgIntensity /= pixelNum;
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int value = color & 0xff;
-
-            contrast += pow((value - avgIntensity), 2);
-        }
-    }
-
-    contrast = (float)sqrt(contrast / pixelNum);
-
-    return contrast;
+    fclose(fo);
 }
 
 
-void ImageManager::adjustContrast(int contrast) noexcept
-{
-    float currentContrast = getContrast();
-    int* histogram = getGrayscaleHistogram();
-    float avgIntensity = 0;
-    float pixelNum = width * height;
+float ImageSystem::getContrast(const Image& img) noexcept {
+    float sum = 0;
+    float sumSq = 0;
+    uint32_t pixelCount = img.height * img.width * 3;
 
-    for (int i = 0; i < 256; i++)
-    {
-        avgIntensity += histogram[i] * i;
+    for (uint32_t i = 0; i < pixelCount; ++i) {
+        sum += img.buf[i];
+        sumSq += img.buf[i] * img.buf[i];
     }
 
-    avgIntensity /= pixelNum;
-
-    float min = avgIntensity - currentContrast;
-    float max = avgIntensity + currentContrast;
-    float newMin = avgIntensity - currentContrast - contrast / 2;
-    float newMax = avgIntensity + currentContrast + contrast / 2;
-
-    newMin = newMin < 0 ? 0 : newMin;
-    newMax = newMax < 0 ? 0 : newMax;
-    newMin = newMin > 255 ? 255 : newMin;
-    newMax = newMax > 255 ? 255 : newMax;
-
-    if (newMin > newMax)
-    {
-        float temp = newMax;
-        newMax = newMin;
-        newMin = temp;
-    }
-
-    float contrastFactor = (newMax - newMin) / (max - min);
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = color & 0xff;
-
-            r = static_cast<int>((r - min) * contrastFactor + newMin);
-            r = r > 255 ? 255 : r;
-            r = r < 0 ? 0 : r;
-
-            g = static_cast<int>((g - min) * contrastFactor + newMin);
-            g = g > 255 ? 255 : g;
-            g = g < 0 ? 0 : g;
-
-            b = static_cast<int>((b - min) * contrastFactor + newMin);
-            b = b > 255 ? 255 : b;
-            b = b < 0 ? 0 : b;
-
-            color = (r << 16) | (g << 8) | b;
-            setRGB(x, y, color);
-        }
-    }
+    float mean = sum / pixelCount;
+    float variance = (sumSq / pixelCount) - (mean * mean);
+    return std::sqrt(variance);
 }
- 
 
-void ImageManager::adjustGamma(float gamma) noexcept
-{
-    const float c = 1.0;
 
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int color = getRGB(x, y);
-
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = color & 0xff;
-
-            r = static_cast<int>(c * pow(r / 255.0, gamma) * 255.0);
-            g = static_cast<int>(c * pow(g / 255.0, gamma) * 255.0);
-            b = static_cast<int>(c * pow(b / 255.0, gamma) * 255.0);
-
-            r = std::clamp(r, 0, 255);
-            g = std::clamp(g, 0, 255);
-            b = std::clamp(b, 0, 255);
-
-            color = (r << 16) | (g << 8) | b;
-
-            setRGB(x, y, color);
-        }
+template<int contrast>
+void ImageSystem::adjustContrast(Image& img) noexcept {
+    float factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+    for (uint32_t i = 0; i < img.height * img.width * 3; ++i) {
+        int value = factor * (img.buf[i] - 128) + 128;
+        img.buf[i] = std::max(0, std::min(255, value));
     }
 }
 
-void ImageManager::setTemperature(int rTemp, int gTemp, int bTemp) noexcept {
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++j) {
-            int color = getRGB(i, j);
-            
-            // Extract the RGB components from the color
-            int r = (color >> 16) & 0xFF;
-            int g = (color >> 8) & 0xFF;
-            int b = color & 0xFF;
-            
-            // Adjust the temperature
-            r = std::clamp(r + rTemp, 0, 255);
-            g = std::clamp(g + gTemp, 0, 255);
-            b = std::clamp(b + bTemp, 0, 255);
-            
-            // Combine the new RGB components back into a single color value
-            int newColor = (r << 16) | (g << 8) | b;
-            
-            // Set the new color to the pixel
-            setRGB(i, j, newColor);
-        }
+template<auto gamma>
+void ImageSystem::adjustGamma(Image& img) noexcept {
+    float inverseGamma = 1 / gamma;
+    for (uint32_t i = 0; i < img.height * img.width * 3; ++i) {
+        img.buf[i] = std::pow(img.buf[i] / 255.0, inverseGamma) * 255.0;
     }
 }
 
-constexpr int clamp(int value, int min, int max) {
-    return value < min ? min : (value > max ? max : value);
+
+template<int rTemp,int gTemp,int bTemp>
+void ImageSystem::setTemperature(Image& img) noexcept {
+    for (uint32_t i = 0; i < img.height * img.width; ++i) {
+        int r = std::max(0, std::min(255, img.buf[i * 3] + rTemp));
+        int g = std::max(0, std::min(255, img.buf[i * 3 + 1] + gTemp));
+        int b = std::max(0, std::min(255, img.buf[i * 3 + 2] + bTemp));
+        img.buf[i * 3] = r;
+        img.buf[i * 3 + 1] = g;
+        img.buf[i * 3 + 2] = b;
+    }
 }
 
-template<int Size>
-constexpr bool is_odd() {
-    return Size % 2 == 1;
-}
+template<int size>
+void ImageSystem::averagingFilter(Image& img) noexcept {
 
-template<int Size>
-void ImageManager::averagingFilter() noexcept {
-    static_assert(is_odd<Size>(), "Size must be an odd number!");
-
-    int *tempBuf = new int[height * width];
-
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int sumRed = 0, sumGreen = 0, sumBlue = 0;
-
-            for (int i = y - Size / 2; i <= y + Size / 2; i++) {
-                for (int j = x - Size / 2; j <= x + Size / 2; j++) {
-                    if (i >= 0 && i < height && j >= 0 && j < width) {
-                        int color = getRGB(j, i);
-                        int r = (color >> 16) & 0xff;
-                        int g = (color >> 8) & 0xff;
-                        int b = color & 0xff;
-                        sumRed += r;
-                        sumGreen += g;
-                        sumBlue += b;
-                    }
+        std::vector<int> buffer(img.width * img.height * 3);
+        int halfSize = size / 2;
+        for (int y = halfSize; y < img.height - halfSize; ++y) {
+        for (int x = halfSize; x < img.width - halfSize; ++x) {
+        int r = 0, g = 0, b = 0;
+        for (int ky = -halfSize; ky <= halfSize; ++ky) {
+            for (int kx = -halfSize; kx <= halfSize; ++kx) {
+                int index = ((y + ky) * img.width + (x + kx)) * 3;
+                r += img.buf[index];
+                g += img.buf[index + 1];
+                b += img.buf[index + 2];
+                }
+                }
+                int area = size * size;
+                int index = (y * img.width + x) * 3;
+                buffer[index] = r / area;
+                buffer[index + 1] = g / area;
+                buffer[index + 2] = b / area;
                 }
             }
-
-            sumRed /= (Size * Size);
-            sumRed = clamp(sumRed, 0, 255);
-
-            sumGreen /= (Size * Size);
-            sumGreen = clamp(sumGreen, 0, 255);
-
-            sumBlue /= (Size * Size);
-            sumBlue = clamp(sumBlue, 0, 255);
-
-            int newColor = (sumRed << 16) | (sumGreen << 8) | sumBlue;
-            tempBuf[y * width + x] = newColor;
-        }
+        std::copy(buffer.begin(), buffer.end(), img.buf);
     }
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            setRGB(x, y, tempBuf[y * width + x]);
-        }
+    template<int size>
+    void ImageSystem::medianFilter(Image& img) noexcept {
+    // Implementation of applying a median filter
+    std::vector<int> buffer(img.width * img.height * 3);
+    int halfSize = size / 2;
+    for (int y = halfSize; y < img.height - halfSize; ++y) {
+    for (int x = halfSize; x < img.width - halfSize; ++x) {
+    std::vector<int> r, g, b;
+    for (int ky = -halfSize; ky <= halfSize; ++ky) {
+    for (int kx = -halfSize; kx <= halfSize; ++kx) {
+    int index = ((y + ky) * img.width + (x + kx)) * 3;
+    r.push_back(img.buf[index]);
+    g.push_back(img.buf[index + 1]);
+    b.push_back(img.buf[index + 2]);
     }
-
-    delete[] tempBuf;
+    }
+    std::sort(r.begin(), r.end());
+    std::sort(g.begin(), g.end());
+    std::sort(b.begin(), b.end());
+    int index = (y * img.width + x) * 3;
+    buffer[index] = r[r.size() / 2];
+    buffer[index + 1] = g[g.size() / 2];
+    buffer[index + 2] = b[b.size() / 2];
+    }
+    }
+    std::copy(buffer.begin(), buffer.end(), img.buf);
 }
 
-template<int Size>
-void ImageManager::medianFilter() noexcept {
-    static_assert(is_odd<Size>(), "Size must be an odd number!");
+template<int k, int size>
+void ImageSystem::unsharpMasking(Image& img) noexcept {
 
-    int *tempBuf = new int[height * width];
+    Image blurred;
+    initImage(blurred);
+    blurred.width = img.width;
+    blurred.height = img.height;
+    blurred.bitDepth = img.bitDepth;
+    blurred.buf = new uint8_t[img.width * img.height * 3];
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            std::array<int, Size * Size> reds, greens, blues;
-            int index = 0;
+    averagingFilter<size>(blurred);
 
-            for (int i = y - Size / 2; i <= y + Size / 2; i++) {
-                for (int j = x - Size / 2; j <= x + Size / 2; j++) {
-                    if (i >= 0 && i < height && j >= 0 && j < width) {
-                        int color = getRGB(j, i);
-                        int r = (color >> 16) & 0xff;
-                        int g = (color >> 8) & 0xff;
-                        int b = color & 0xff;
-                        reds[index] = r;
-                        greens[index] = g;
-                        blues[index] = b;
-                        index++;
-                    }
-                }
-            }
-
-            std::sort(reds.begin(), reds.begin() + index);
-            std::sort(greens.begin(), greens.begin() + index);
-            std::sort(blues.begin(), blues.begin() + index);
-
-            int newColor = (reds[index / 2] << 16) | (greens[index / 2] << 8) | blues[index / 2];
-            tempBuf[y * width + x] = newColor;
-        }
+    for (uint32_t i = 0; i < img.width * img.height * 3; ++i) {
+        int value = img.buf[i] + k * (img.buf[i] - blurred.buf[i]);
+        img.buf[i] = std::max(0, std::min(255, value));
     }
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            setRGB(x, y, tempBuf[y * width + x]);
-        }
-    }
+    destroyImage(blurred);
 
-    delete[] tempBuf;
 }
 
 
-template<int K, int Size>
-void ImageManager::unsharpMasking() noexcept{
-    static_assert(is_odd<Size>(), "Size must be an odd number!");
-
-    int *tempBuf = new int[height * width];
-
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int sumRed = 0, sumGreen = 0, sumBlue = 0;
-
-            for (int i = y - Size / 2; i <= y + Size / 2; i++) {
-                for (int j = x - Size / 2; j <= x + Size / 2; j++) {
-                    if (i >= 0 && i < height && j >= 0 && j < width) {
-                        int color = getRGB(j, i);
-                        int r = (color >> 16) & 0xff;
-                        int g = (color >> 8) & 0xff;
-                        int b = color & 0xff;
-                        sumRed += r;
-                        sumGreen += g;
-                        sumBlue += b;
-                    }
-                }
-            }
-
-            sumRed /= (Size * Size);
-            sumRed = clamp(sumRed, 0, 255);
-
-            sumGreen /= (Size * Size);
-            sumGreen = clamp(sumGreen, 0, 255);
-
-            sumBlue /= (Size * Size);
-            sumBlue = clamp(sumBlue, 0, 255);
-
-            int color = getRGB(x, y);
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = color & 0xff;
-
-            int newR = r + K * (r - sumRed);
-            newR = clamp(newR, 0, 255);
-
-            int newG = g + K * (g - sumGreen);
-            newG = clamp(newG, 0, 255);
-
-            int newB = b + K * (b - sumBlue);
-            newB = clamp(newB, 0, 255);
-
-            int newColor = (newR << 16) | (newG << 8) | newB;
-            tempBuf[y * width + x] = newColor;
-        }
-    }
-
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            setRGB(x, y, tempBuf[y * width + x]);
-        }
-    }
-    
-}
-
-// Explicit template instantiations
-template void ImageManager::averagingFilter<3>();
-template void ImageManager::averagingFilter<7>();
-template void ImageManager::averagingFilter<15>();
-template void ImageManager::medianFilter<3>();
-template void ImageManager::medianFilter<7>();
-template void ImageManager::medianFilter<15>();
-template void ImageManager::unsharpMasking<1, 3>();

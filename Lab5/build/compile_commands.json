@@ -1,19 +1,19 @@
 [
 {
   "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build",
-  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab5.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab5.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp",
   "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp",
   "output": "CMakeFiles/Lab5.dir/Main.cpp.o"
 },
 {
   "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build",
-  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab5.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab5.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp",
   "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp",
   "output": "CMakeFiles/Lab5.dir/src/ImageManager.cpp.o"
 },
 {
   "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build",
-  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp",
   "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp",
   "output": "CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o"
 }

@@ -7,59 +7,73 @@
 
 #include <iostream>
 #include <cstdio>
-#include <fstream>
-#include<cmath>
-#include <fstream>
-#include<algorithm>
+#include <cmath>
+#include <algorithm>
 #include <vector>
+#include <cassert>
+#include <numeric>
+#include <string_view>
 #include<cassert>
 
-class ImageManager 
-{
-    public:
-        ImageManager() noexcept;
-        virtual ~ImageManager() noexcept;
-
-        bool read(const char* fileName)noexcept;
-        bool write(const char* fileName)noexcept;
-
-
-        void convertToRed()noexcept;
-        void convertToGreen()noexcept;
-        void convertToBlue()noexcept;
-        void convertToGrayscale()noexcept;
-        void restoreToOriginal()noexcept;
-        [[nodiscard]]int getRGB(int x, int y)noexcept;
-        void setRGB(int x, int y, int color)noexcept;
-        void adjustBrightness(int brightness) noexcept;
-        void invert() noexcept;
-        [[nodiscard]]int * getGrayscaleHistogram() noexcept;
-        void writeHistogramToCSV(int* histogram, const char* fileName) noexcept;
-        [[nodiscard]] float getContrast() noexcept;
-        void adjustContrast(int contrast) noexcept;
-        void adjustGamma(float gamma) noexcept;
-        void setTemperature(int rTemp,int gTemp,int bTemp) noexcept;
-        
-        template<int size>
-        void averagingFilter() noexcept;
-
-        template<int size>
-        void medianFilter() noexcept;
-
-        template<int k,int size>
-        void unsharpMasking() noexcept;
-
-    public:
-
-        uint32_t width;
-        uint32_t height;
-        uint32_t bitDepth;
-
-    private:
-        uint8_t * header;
-        uint8_t * colorTable;
-        uint8_t * buf;
-        uint8_t * original;
+struct Image {
+    uint32_t width;
+    uint32_t height;
+    uint32_t bitDepth;
+    uint8_t* header;
+    uint8_t* colorTable;
+    uint8_t* buf;
+    uint8_t* original;
 };
 
-#endif
+class ImageSystem {
+public:
+    static void initImage(Image& img) noexcept;
+    static void destroyImage(Image& img) noexcept;
+
+
+    static bool readImage(Image& img,std::string_view fileName) noexcept;
+
+    static bool writeImage(const Image& img,std::string_view fileName) noexcept;
+
+    static void convertToRed(Image& img) noexcept;
+    static void convertToGreen(Image& img) noexcept;
+    static void convertToBlue(Image& img) noexcept;
+    static void convertToGrayscale(Image& img) noexcept;
+    static void restoreToOriginal(Image& img) noexcept;
+
+    static int getRGB(const Image& img,int x,int y) noexcept;
+    static void setRGB(Image& img, int x, int y, int color) noexcept;
+
+    template<int brightness>
+    static void adjustBrightness(Image& img) noexcept;
+
+    static void invert(Image& img) noexcept;
+    static int* getGrayscaleHistogram(const Image& img) noexcept;
+
+
+    static void writeHistogramToCSV(std::string_view src,std::string_view dest) noexcept;
+
+    static float getContrast(const Image& img) noexcept;
+
+    template<int contrast>
+    static void adjustContrast(Image& img) noexcept;
+
+    template<auto gamma>
+    static void adjustGamma(Image &image) noexcept;
+
+    template<int rTemp, int gTemp, int bTemp>
+    static void setTemperature(Image& img) noexcept;
+
+    template<int Size>
+    static void averagingFilter(Image& img) noexcept;
+
+    template<int size>
+    static void medianFilter(Image& img) noexcept;
+
+    template<int k, int size>
+    static void unsharpMasking(Image& img) noexcept;
+};
+
+
+
+#endif // __IMAGE_MANAGER__

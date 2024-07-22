@@ -4,15 +4,26 @@
 #include"ImageManager.h"
 
 #include<complex>
-#include<cmath>
+
+using Complex = std::complex<double>;
 
 
 struct FrequencyComponent{
-    
+
+    Image im;
+    Complex *img;
+    Complex *original;
+
 };
 
+class FrequencyDomainSystem{
 
-class 
+    void fdInit(FrequencyComponent & fc);
+    void fdDestroy(FrequencyComponent & fc);
+    
+
+}
+
 
 
 

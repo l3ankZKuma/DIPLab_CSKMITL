@@ -6,7 +6,7 @@ CXX_DEFINES = -DIMAGES_DIR=\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/image
 
 CXX_INCLUDES = -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src
 
-CXX_FLAGSarm64 = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGSarm64 = -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
 
-CXX_FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGS = -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
 
