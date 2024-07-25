@@ -9,8 +9,13 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp" "CMakeFiles/Lab5.dir/Main.cpp.o" "gcc" "CMakeFiles/Lab5.dir/Main.cpp.o.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx" "CMakeFiles/Lab5.dir/Main.cpp.o" "gcc" "CMakeFiles/Lab5.dir/Main.cpp.o.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.cxx" "CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch" "gcc" "CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx" "CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch" "gcc" "CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch.d"
   "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp" "CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o" "gcc" "CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx" "CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o" "gcc" "CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o.d"
   "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp" "CMakeFiles/Lab5.dir/src/ImageManager.cpp.o" "gcc" "CMakeFiles/Lab5.dir/src/ImageManager.cpp.o.d"
+  "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx" "CMakeFiles/Lab5.dir/src/ImageManager.cpp.o" "gcc" "CMakeFiles/Lab5.dir/src/ImageManager.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

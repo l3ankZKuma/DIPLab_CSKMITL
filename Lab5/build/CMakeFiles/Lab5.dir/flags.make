@@ -6,7 +6,15 @@ CXX_DEFINES = -DIMAGES_DIR=\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/image
 
 CXX_INCLUDES = -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src
 
-CXX_FLAGSarm64 = -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGSarm64 = -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native
 
-CXX_FLAGS = -g -std=gnu++2b -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGS = -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native
+
+# PCH options: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch_OPTIONS = -Winvalid-pch;-Xclang;-emit-pch;-Xclang;-include;-Xclang;/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx;-x;c++-header
+
+# PCH options: CMakeFiles/Lab5.dir/Main.cpp.o_OPTIONS = -Winvalid-pch;;-Xarch_arm64;-include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
+
+# PCH options: CMakeFiles/Lab5.dir/src/ImageManager.cpp.o_OPTIONS = -Winvalid-pch;;-Xarch_arm64;-include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
+
+# PCH options: CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o_OPTIONS = -Winvalid-pch;;-Xarch_arm64;-include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
 

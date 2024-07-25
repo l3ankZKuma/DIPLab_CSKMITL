@@ -5,15 +5,8 @@
 #define BMP_COLOR_TABLE_SIZE 1024
 #define BMP_HEADER_SIZE 54
 
-#include <iostream>
-#include <cstdio>
-#include <cmath>
-#include <algorithm>
-#include <vector>
-#include <cassert>
-#include <numeric>
-#include <string_view>
-#include<cassert>
+struct Fd;
+
 
 struct Image {
     uint32_t width;
@@ -25,13 +18,14 @@ struct Image {
     uint8_t* original;
 };
 
-class ImageSystem {
-public:
+
+struct ImageSystem {
     static void initImage(Image& img) noexcept;
     static void destroyImage(Image& img) noexcept;
+    static Fd getFrequencyDomain(const Image& img) noexcept;
 
 
-    static bool readImage(Image& img,std::string_view fileName) noexcept;
+    [[nodicard]]static bool readImage(Image& img,std::string_view fileName) noexcept;
 
     static bool writeImage(const Image& img,std::string_view fileName) noexcept;
 
@@ -41,7 +35,7 @@ public:
     static void convertToGrayscale(Image& img) noexcept;
     static void restoreToOriginal(Image& img) noexcept;
 
-    static int getRGB(const Image& img,int x,int y) noexcept;
+    [[nodiscard]]static int getRGB(const Image& img,int x,int y) noexcept;
     static void setRGB(Image& img, int x, int y, int color) noexcept;
 
     template<int brightness>
@@ -72,6 +66,8 @@ public:
 
     template<int k, int size>
     static void unsharpMasking(Image& img) noexcept;
+
+
 };
 
 

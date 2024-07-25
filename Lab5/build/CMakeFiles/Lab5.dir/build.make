@@ -69,47 +69,68 @@ include CMakeFiles/Lab5.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Lab5.dir/flags.make
 
+CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch: CMakeFiles/Lab5.dir/flags.make
+CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.cxx
+CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
+CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch: CMakeFiles/Lab5.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGSarm64) -Winvalid-pch -Xclang -emit-pch -Xclang -include -Xclang /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -x c++-header -MD -MT CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch -MF CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch.d -o CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.cxx
+
+CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGSarm64) -Winvalid-pch -Xclang -emit-pch -Xclang -include -Xclang /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -x c++-header -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.cxx > CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.i
+
+CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGSarm64) -Winvalid-pch -Xclang -emit-pch -Xclang -include -Xclang /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -x c++-header -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.cxx -o CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.s
+
 CMakeFiles/Lab5.dir/Main.cpp.o: CMakeFiles/Lab5.dir/flags.make
 CMakeFiles/Lab5.dir/Main.cpp.o: /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp
+CMakeFiles/Lab5.dir/Main.cpp.o: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
+CMakeFiles/Lab5.dir/Main.cpp.o: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch
 CMakeFiles/Lab5.dir/Main.cpp.o: CMakeFiles/Lab5.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Lab5.dir/Main.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Lab5.dir/Main.cpp.o -MF CMakeFiles/Lab5.dir/Main.cpp.o.d -o CMakeFiles/Lab5.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Lab5.dir/Main.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -MD -MT CMakeFiles/Lab5.dir/Main.cpp.o -MF CMakeFiles/Lab5.dir/Main.cpp.o.d -o CMakeFiles/Lab5.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp
 
 CMakeFiles/Lab5.dir/Main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Lab5.dir/Main.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp > CMakeFiles/Lab5.dir/Main.cpp.i
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp > CMakeFiles/Lab5.dir/Main.cpp.i
 
 CMakeFiles/Lab5.dir/Main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Lab5.dir/Main.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp -o CMakeFiles/Lab5.dir/Main.cpp.s
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/Main.cpp -o CMakeFiles/Lab5.dir/Main.cpp.s
 
 CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: CMakeFiles/Lab5.dir/flags.make
 CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp
+CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
+CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch
 CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: CMakeFiles/Lab5.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Lab5.dir/src/ImageManager.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Lab5.dir/src/ImageManager.cpp.o -MF CMakeFiles/Lab5.dir/src/ImageManager.cpp.o.d -o CMakeFiles/Lab5.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Lab5.dir/src/ImageManager.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -MD -MT CMakeFiles/Lab5.dir/src/ImageManager.cpp.o -MF CMakeFiles/Lab5.dir/src/ImageManager.cpp.o.d -o CMakeFiles/Lab5.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp
 
 CMakeFiles/Lab5.dir/src/ImageManager.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Lab5.dir/src/ImageManager.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp > CMakeFiles/Lab5.dir/src/ImageManager.cpp.i
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp > CMakeFiles/Lab5.dir/src/ImageManager.cpp.i
 
 CMakeFiles/Lab5.dir/src/ImageManager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Lab5.dir/src/ImageManager.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp -o CMakeFiles/Lab5.dir/src/ImageManager.cpp.s
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp -o CMakeFiles/Lab5.dir/src/ImageManager.cpp.s
 
 CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o: CMakeFiles/Lab5.dir/flags.make
 CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o: /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp
+CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx
+CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch
 CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o: CMakeFiles/Lab5.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o -MF CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o.d -o CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -MD -MT CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o -MF CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o.d -o CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp
 
 CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp > CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.i
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -E /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp > CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.i
 
 CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp -o CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.s
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx -S /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.cpp -o CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.s
 
 # Object files for target Lab5
 Lab5_OBJECTS = \
@@ -120,12 +141,13 @@ Lab5_OBJECTS = \
 # External object files for target Lab5
 Lab5_EXTERNAL_OBJECTS =
 
+Lab5: CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch
 Lab5: CMakeFiles/Lab5.dir/Main.cpp.o
 Lab5: CMakeFiles/Lab5.dir/src/ImageManager.cpp.o
 Lab5: CMakeFiles/Lab5.dir/src/FrequencyDomainManager.cpp.o
 Lab5: CMakeFiles/Lab5.dir/build.make
 Lab5: CMakeFiles/Lab5.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable Lab5"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable Lab5"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Lab5.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

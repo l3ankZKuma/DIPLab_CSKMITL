@@ -1,6 +1,6 @@
+#include"pch.h"
 #include "ImageManager.h"
-
-
+#include"FrequencyDomainManager.h"
 
 
 void ImageSystem::initImage(Image& img) noexcept {
@@ -19,7 +19,10 @@ void ImageSystem::destroyImage(Image& img) noexcept {
 }
 
 
+
 bool ImageSystem::readImage(Image& img, std::string_view fileName) noexcept {
+
+
     FILE* fi = fopen(fileName.data(), "rb");
     if (fi == nullptr) {
         std::cout << "Unable to open file" << '\n';
@@ -279,4 +282,16 @@ void ImageSystem::unsharpMasking(Image& img) noexcept {
 
 }
 
+
+
+Fd ImageSystem::getFrequencyDomain(const Image& img) noexcept {
+    Image tempImg = img;
+    convertToGrayscale(tempImg);
+    
+    Fd fd;
+    FdSystem::initFd(fd, tempImg);
+    FdSystem::transformToFrequencyDomain(fd);
+    
+    return fd;
+}
 

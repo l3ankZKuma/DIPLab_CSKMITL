@@ -153,6 +153,21 @@ Main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab5.dir/build.make CMakeFiles/Lab5.dir/Main.cpp.s
 .PHONY : Main.cpp.s
 
+# target to build an object file
+cmake_pch_arm64.hxx.pch:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab5.dir/build.make CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.pch
+.PHONY : cmake_pch_arm64.hxx.pch
+
+# target to preprocess a source file
+cmake_pch_arm64.hxx.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab5.dir/build.make CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.i
+.PHONY : cmake_pch_arm64.hxx.i
+
+# target to generate assembly for a file
+cmake_pch_arm64.hxx.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab5.dir/build.make CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.s
+.PHONY : cmake_pch_arm64.hxx.s
+
 src/FrequencyDomainManager.o: src/FrequencyDomainManager.cpp.o
 .PHONY : src/FrequencyDomainManager.o
 
@@ -213,6 +228,9 @@ help:
 	@echo "... Main.o"
 	@echo "... Main.i"
 	@echo "... Main.s"
+	@echo "... cmake_pch_arm64.hxx.pch"
+	@echo "... cmake_pch_arm64.hxx.i"
+	@echo "... cmake_pch_arm64.hxx.s"
 	@echo "... src/FrequencyDomainManager.o"
 	@echo "... src/FrequencyDomainManager.i"
 	@echo "... src/FrequencyDomainManager.s"

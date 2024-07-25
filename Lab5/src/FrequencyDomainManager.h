@@ -1,42 +1,31 @@
-#ifndef __FREQUENCYDOMAIN_MANAGER_
-#define __FREQUENCYDOMAIN_MANAGER_
+#ifndef __FREQUENCY_DOMAIN_MANAGER__
+#define __FREQUENCY_DOMAIN_MANAGER__
 
-#include"ImageManager.h"
 
-#include<complex>
-
+struct Image;
 using Complex = std::complex<double>;
 
+struct Fd {
+    Complex* img;
+    Complex* original;
+    Image* image;
+    int width;
+    int height;
+    int imgWidth;
+    int imgHeight;
+};
 
-struct FrequencyComponent{
-
-    Image im;
-    Complex *img;
-    Complex *original;
+struct FdSystem {
+    static void initFd(Fd& fd, const Image& im) noexcept;
+    static void destroyFd(Fd& fd) noexcept;
+    static void fft2d(Fd& fd) noexcept;
+    static void transformToFrequencyDomain(Fd& fd) noexcept;
+    static bool writeSpectrumLogScale(const Fd& fd, std::string_view fileName) noexcept;
+    static bool writePhase(const Fd& fd, std::string_view fileName) noexcept;
+    
+private:
+    static void fft(Complex* x, int size) noexcept;
 
 };
 
-class FrequencyDomainSystem{
-
-    void fdInit(FrequencyComponent & fc);
-    void fdDestroy(FrequencyComponent & fc);
-    
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
-
-
+#endif // __FREQUENCY_DOMAIN_MANAGER__

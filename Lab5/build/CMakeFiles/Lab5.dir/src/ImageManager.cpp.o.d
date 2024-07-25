@@ -1,6 +1,7 @@
 CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: \
-  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp \
-  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.h \
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx.cxx \
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/build/CMakeFiles/Lab5.dir/cmake_pch_arm64.hxx \
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/pch.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__assert \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__config \
@@ -391,7 +392,6 @@ CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/pthread/qos.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/sys/qos.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/sys/_types/_mach_port_t.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/sched.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__mutex/unique_lock.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__mutex/tag_types.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__system_error/system_error.h \
@@ -533,6 +533,8 @@ CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/sys/_types/_fsfilcnt_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/_types/_nl_item.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__locale_dir/locale_base_api/bsd_locale_defaults.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/complex \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/sstream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/algorithm \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__algorithm/all_of.h \
@@ -802,4 +804,7 @@ CMakeFiles/Lab5.dir/src/ImageManager.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/partial_sum.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/pstl_reduce.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/transform_exclusive_scan.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/transform_inclusive_scan.h
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/transform_inclusive_scan.h \
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.cpp \
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/ImageManager.h \
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab5/src/FrequencyDomainManager.h
