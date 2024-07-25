@@ -10,9 +10,11 @@ int main() {
     ImageSystem::initImage(image);
     ImageSystem::readImage(image, PATH_IMAGES "mandril.bmp");
 
+
     Fd fd = ImageSystem::getFrequencyDomain(image);
-    FdSystem::writeSpectrumLogScale(fd, PATH_IMAGES "mandril_spectrum.bmp");
-    FdSystem::writePhase(fd, PATH_IMAGES "mandril_phase.bmp");
+    
+    FdSystem::writeSpectrumLogScale(fd, PATH_IMAGES "spectrum.bmp");
+    FdSystem::writePhase(fd, PATH_IMAGES "phase.bmp");
 
 
 

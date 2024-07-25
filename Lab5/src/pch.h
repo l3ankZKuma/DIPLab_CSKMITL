@@ -11,6 +11,7 @@
 #include <string_view>
 #include <cassert>
 #include <numeric>
+#include<cstring>
 
 
 

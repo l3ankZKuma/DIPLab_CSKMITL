@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "complex": "cpp"
+        "complex": "cpp",
+        "new": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

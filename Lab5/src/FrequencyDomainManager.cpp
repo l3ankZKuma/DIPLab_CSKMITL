@@ -2,9 +2,12 @@
 #include "FrequencyDomainManager.h"
 #include "ImageManager.h"
 
-#define NEXT_POWER_OF_2(x) (1 << (32 - __builtin_clz((x) - 1)))
+#define NEXT_POWER_OF_2(x) ((x) & ((x) - 1)) ? (1 << (32 - __builtin_clz((x) - 1))) : (x)
+#define DBL_MIN 2.2250738585072014e-308
+#define DBL_MAX 1.7976931348623158e+308
 
 void FdSystem::initFd(Fd& fd, const Image& im) noexcept {
+
     fd.image = const_cast<Image*>(&im);
     fd.imgWidth = im.width;
     fd.imgHeight = im.height;
@@ -12,6 +15,9 @@ void FdSystem::initFd(Fd& fd, const Image& im) noexcept {
     fd.height = NEXT_POWER_OF_2(fd.imgHeight);
     fd.img = new Complex[fd.height * fd.width];
     fd.original = new Complex[fd.height * fd.width];
+
+    fft2d(fd, true);
+    shifting(fd);
 }
 
 void FdSystem::destroyFd(Fd& fd) noexcept {
@@ -19,7 +25,8 @@ void FdSystem::destroyFd(Fd& fd) noexcept {
     delete[] fd.original;
 }
 
-void FdSystem::fft(Complex* x, int size) noexcept {
+
+void FdSystem::fft(Complex* x, int size,bool invert) noexcept {
     if (size <= 1) return;
 
     Complex* even = new Complex[size / 2];
@@ -33,13 +40,18 @@ void FdSystem::fft(Complex* x, int size) noexcept {
     fft(even, size / 2);
     fft(odd, size / 2);
 
-    double angle = 2 * M_PI / size;
+    double angle = 2 * M_PI / size * (invert ? -1 : 1);
     Complex w(1);
     Complex wn(cos(angle), sin(angle));
 
     for (int i = 0; i < size / 2; i++) {
         x[i] = even[i] + w * odd[i];
         x[i + size / 2] = even[i] - w * odd[i];
+        if (invert)
+        {
+            x[i] /= 2;
+            x[i + size / 2] /= 2;
+        }
         w *= wn;
     }
 
@@ -47,9 +59,9 @@ void FdSystem::fft(Complex* x, int size) noexcept {
     delete[] odd;
 }
 
-void FdSystem::fft2d(Fd& fd) noexcept {
+void FdSystem::fft2d(Fd& fd,bool inverse) noexcept {
     for (int y = 0; y < fd.height; y++) {
-        fft(&fd.img[y * fd.width], fd.width);
+        fft(&fd.img[y * fd.width], fd.width,inverse);
     }
 
     Complex* column = new Complex[fd.height];
@@ -57,7 +69,7 @@ void FdSystem::fft2d(Fd& fd) noexcept {
         for (int y = 0; y < fd.height; y++) {
             column[y] = fd.img[y * fd.width + x];
         }
-        fft(column, fd.height);
+        fft(column, fd.height,inverse);
         for (int y = 0; y < fd.height; y++) {
             fd.img[y * fd.width + x] = column[y];
         }
@@ -81,89 +93,156 @@ void FdSystem::transformToFrequencyDomain(Fd& fd) noexcept {
     }
 }
 
-bool FdSystem::writePhase(const Fd& fd, std::string_view fileName) noexcept {
-    Image phaseImg;
-    ImageSystem::initImage(phaseImg);
-    phaseImg.width = fd.width;
-    phaseImg.height = fd.height;
-    phaseImg.bitDepth = 24; // We'll use 24-bit color depth
-    phaseImg.buf = new uint8_t[phaseImg.height * phaseImg.width * 3];
+bool FdSystem::writeSpectrumLogScale(const Fd& fd, std::string_view fileName) noexcept {
+    std::cout << "Starting to write spectrum log scale..." << std::endl;
 
-    // Find min and max phase values
-    double max = -M_PI, min = M_PI;
-    for (int y = 0; y < fd.height; ++y) {
-        for (int x = 0; x < fd.width; ++x) {
-            double phase = std::arg(fd.img[y * fd.width + x]);
-            if (phase > max) max = phase;
-            if (phase < min) min = phase;
+    Image img;
+    ImageSystem::initImage(img);
+    img.width = fd.imgWidth;
+    img.height = fd.imgHeight;
+    img.bitDepth = 24;  // We're creating a 24-bit color image
+
+    std::cout << "Image initialized with dimensions: " << img.width << "x" << img.height << std::endl;
+
+    // Copy the existing header
+    std::memcpy(img.header, fd.image->header, BMP_HEADER_SIZE);
+
+    // Update the width and height in the header
+    *reinterpret_cast<int*>(&img.header[18]) = img.width;
+    *reinterpret_cast<int*>(&img.header[22]) = img.height;
+
+    // Update the bit depth in the header
+    *reinterpret_cast<short*>(&img.header[28]) = img.bitDepth;
+
+    // Calculate and update the file size in the header
+    int fileSize = BMP_HEADER_SIZE + (img.width * img.height * 3);
+    *reinterpret_cast<int*>(&img.header[2]) = fileSize;
+
+    std::cout << "Header updated." << std::endl;
+
+    try {
+        img.buf = new uint8_t[img.width * img.height * 3];
+        std::cout << "Image buffer allocated." << std::endl;
+    } catch (const std::bad_alloc& e) {
+        std::cerr << "Memory allocation failed: " << e.what() << std::endl;
+        ImageSystem::destroyImage(img);
+        return false;
+    }
+
+    double maxMagnitude = 0;
+    for (int y = 0; y < fd.imgHeight; y++) {
+        for (int x = 0; x < fd.imgWidth; x++) {
+            Complex c = fd.img[y * fd.width + x];
+            double magnitude = std::abs(c);
+            if (magnitude > maxMagnitude) maxMagnitude = magnitude;
         }
     }
 
-    // Normalize and write phase values
-    for (int y = 0; y < fd.height; ++y) {
-        for (int x = 0; x < fd.width; ++x) {
-            double phase = std::arg(fd.img[y * fd.width + x]);
-            // Normalize phase to [0, 255]
-            uint8_t phaseColor = static_cast<uint8_t>((phase - min) * 255.0 / (max - min));
-            
-            int bufIndex = (y * fd.width + x) * 3;
-            phaseImg.buf[bufIndex] = phaseColor;
-            phaseImg.buf[bufIndex + 1] = phaseColor;
-            phaseImg.buf[bufIndex + 2] = phaseColor;
+    std::cout << "Max magnitude calculated: " << maxMagnitude << std::endl;
+
+    for (int y = 0; y < fd.imgHeight; y++) {
+        for (int x = 0; x < fd.imgWidth; x++) {
+            Complex c = fd.img[y * fd.width + x];
+            double magnitude = std::abs(c);
+            int intensity = static_cast<int>(255 * std::log(1 + magnitude) / std::log(1 + maxMagnitude));
+
+            int index = (y * img.width + x) * 3;
+            img.buf[index] = intensity;
+            img.buf[index + 1] = intensity;
+            img.buf[index + 2] = intensity;
         }
     }
 
-    // Copy header from original image
-    std::memcpy(phaseImg.header, fd.image->header, BMP_HEADER_SIZE);
+    std::cout << "Spectrum data processed." << std::endl;
 
-    // Update header for new image dimensions and bit depth
-    *reinterpret_cast<int*>(&phaseImg.header[18]) = phaseImg.width;
-    *reinterpret_cast<int*>(&phaseImg.header[22]) = phaseImg.height;
-    *reinterpret_cast<int*>(&phaseImg.header[28]) = phaseImg.bitDepth;
+    bool result = ImageSystem::writeImage(img, fileName);
+    std::cout << "Image writing " << (result ? "successful" : "failed") << std::endl;
 
-    int paddedRowSize = ((phaseImg.width * 3 + 3) / 4) * 4;
-    int fileSize = BMP_HEADER_SIZE + (paddedRowSize * phaseImg.height);
-    *reinterpret_cast<int*>(&phaseImg.header[2]) = fileSize;
-
-    bool result = ImageSystem::writeImage(phaseImg, fileName);
-
-    ImageSystem::destroyImage(phaseImg);
+    ImageSystem::destroyImage(img);
+    std::cout << "Temporary image destroyed." << std::endl;
 
     return result;
 }
 
-bool FdSystem::writeSpectrumLogScale(const Fd& fd, std::string_view fileName) noexcept {
-    Image spectrumImg;
-    ImageSystem::initImage(spectrumImg);
-    spectrumImg.width = fd.width;
-    spectrumImg.height = fd.height;
-    spectrumImg.bitDepth = 24; // Assuming 24-bit color depth
-    spectrumImg.buf = new uint8_t[spectrumImg.height * spectrumImg.width * 3];
+bool FdSystem::writePhase(const Fd& fd, std::string_view fileName) noexcept {
+    std::cout << "Starting to write phase..." << std::endl;
 
-    // Find the maximum magnitude for normalization
-    double maxMagnitude = 0.0;
-    for (int i = 0; i < fd.width * fd.height; ++i) {
-        double magnitude = std::abs(fd.img[i]);
-        if (magnitude > maxMagnitude) maxMagnitude = magnitude;
+    Image img;
+    ImageSystem::initImage(img);
+    img.width = fd.imgWidth;
+    img.height = fd.imgHeight;
+    img.bitDepth = 24;  // We're creating a 24-bit color image
+
+    std::cout << "Image initialized with dimensions: " << img.width << "x" << img.height << std::endl;
+
+    // Copy the existing header
+    std::memcpy(img.header, fd.image->header, BMP_HEADER_SIZE);
+
+    // Update the width and height in the header
+    *reinterpret_cast<int*>(&img.header[18]) = img.width;
+    *reinterpret_cast<int*>(&img.header[22]) = img.height;
+
+    // Update the bit depth in the header
+    *reinterpret_cast<short*>(&img.header[28]) = img.bitDepth;
+
+    // Calculate and update the file size in the header
+    int fileSize = BMP_HEADER_SIZE + (img.width * img.height * 3);
+    *reinterpret_cast<int*>(&img.header[2]) = fileSize;
+
+    std::cout << "Header updated." << std::endl;
+
+    try {
+        img.buf = new uint8_t[img.width * img.height * 3];
+        std::cout << "Image buffer allocated." << std::endl;
+    } catch (const std::bad_alloc& e) {
+        std::cerr << "Memory allocation failed: " << e.what() << std::endl;
+        ImageSystem::destroyImage(img);
+        return false;
     }
 
-    for (int y = 0; y < fd.height; ++y) {
-        for (int x = 0; x < fd.width; ++x) {
-            int index = y * fd.width + x;
-            double magnitude = std::abs(fd.img[index]);
-            
-            // Apply log scale and normalize to [0, 255]
-            double logMagnitude = std::log(1 + magnitude);
-            uint8_t intensity = static_cast<uint8_t>(255 * logMagnitude / std::log(1 + maxMagnitude));
-            
-            int bufIndex = (y * fd.width + x) * 3;
-            spectrumImg.buf[bufIndex] = intensity;
-            spectrumImg.buf[bufIndex + 1] = intensity;
-            spectrumImg.buf[bufIndex + 2] = intensity;
+    for (int y = 0; y < fd.imgHeight; y++) {
+        for (int x = 0; x < fd.imgWidth; x++) {
+            Complex c = fd.img[y * fd.width + x];
+            double phase = std::arg(c);
+            int intensity = static_cast<int>((phase + M_PI) / (2 * M_PI) * 255);
+
+            int index = (y * img.width + x) * 3;
+            img.buf[index] = intensity;
+            img.buf[index + 1] = intensity;
+            img.buf[index + 2] = intensity;
         }
     }
 
-    bool result = ImageSystem::writeImage(spectrumImg, fileName);
-    ImageSystem::destroyImage(spectrumImg);
+    std::cout << "Phase data processed." << std::endl;
+
+    bool result = ImageSystem::writeImage(img, fileName);
+    std::cout << "Image writing " << (result ? "successful" : "failed") << std::endl;
+
+    ImageSystem::destroyImage(img);
+    std::cout << "Temporary image destroyed." << std::endl;
+
     return result;
+}
+
+
+
+
+
+void FdSystem::shifting(Fd& fd) noexcept {
+        int halfWidth = fd.width / 2;
+        int halfHeight = fd.height / 2;
+        for (int y = 0; y < halfHeight; y++) {
+            for (int x = 0; x < fd.width; x++) {
+                Complex temp = Complex(fd.img[y * fd.width + x].real(), fd.img[y * fd.width + x].imag());
+                fd.img[y * fd.width + x] = Complex(fd.img[(y + halfHeight) * fd.width + x].real(), fd.img[(y + halfHeight) * fd.width + x].imag());
+                fd.img[(y + halfHeight) * fd.width + x] = Complex(temp.real(), temp.imag());
+            }
+        }
+        for (int y = 0; y < fd.height; y++) {
+            for (int x = 0; x < halfWidth; x++) {
+                Complex temp = Complex(fd.img[y * fd.width + x].real(), fd.img[y * fd.width + x].imag());
+                fd.img[y * fd.width + x] = Complex(fd.img[y * fd.width + x + halfWidth].real(), fd.img[y * fd.width + x + halfWidth].imag());
+                fd.img[y * fd.width + x + halfWidth] = Complex(temp.real(), temp.imag());
+            }
+        }
 }
