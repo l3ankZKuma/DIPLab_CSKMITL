@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xclang -emit-pch -Xclang -include -Xclang /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build/CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx -x c++-header -o CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx.pch -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build/CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx.cxx",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build/CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx.cxx",
+  "output": "CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx.pch"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build/CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx -o CMakeFiles/Lab6.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/Main.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/Main.cpp",
+  "output": "CMakeFiles/Lab6.dir/Main.cpp.o"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build/CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx -o CMakeFiles/Lab6.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src/ImageManager.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src/ImageManager.cpp",
+  "output": "CMakeFiles/Lab6.dir/src/ImageManager.cpp.o"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/build/CMakeFiles/Lab6.dir/cmake_pch_arm64.hxx -o CMakeFiles/Lab6.dir/src/FrequencyDomainManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src/FrequencyDomainManager.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Lab6/src/FrequencyDomainManager.cpp",
+  "output": "CMakeFiles/Lab6.dir/src/FrequencyDomainManager.cpp.o"
+}
+]

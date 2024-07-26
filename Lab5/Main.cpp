@@ -10,7 +10,7 @@ int main() {
     ImageSystem::readImage(image, PATH_IMAGES "mandril.bmp");
 
     const Fd &fd_bind = ImageSystem::getFrequencyDomain(image);
-    Fd fd = const_cast<Fd&>(fd_bind);
+    auto fd = const_cast<Fd&>(fd_bind);
 
     FdSystem::writeSpectrumLogScale(fd, PATH_IMAGES "mandril_spectrum.bmp");
     FdSystem::writePhase(fd, PATH_IMAGES "mandril_phase.bmp");
@@ -18,7 +18,6 @@ int main() {
     std::array<double, 4> radius{3, 5, 10, 20};
 
     for (int i = 0; i < radius.size(); ++i) {
-        // Create a string stream to build the filename
         std::ostringstream ss;
         
         FdSystem::ILPF(fd, radius[i]);
@@ -33,6 +32,8 @@ int main() {
         
         std::copy_n(fd.original, fd.height * fd.width, fd.img);
     }
+
+    
 
     ImageSystem::destroyImage(image);
     FdSystem::destroyFd(fd);

@@ -68,6 +68,9 @@ struct ImageSystem {
     static void unsharpMasking(Image& img) noexcept;
 
 
+    template<auto percent>
+    static void adddPepperSaltNoise(Image& img) noexcept;
+
 };
 
 
