@@ -1,13 +1,11 @@
-#include"pch.h"
+#include "pch.h"
 #include "FrequencyDomainManager.h"
 #include "ImageManager.h"
 
+
 #define NEXT_POWER_OF_2(x) ((x) & ((x) - 1)) ? (1 << (32 - __builtin_clz((x) - 1))) : (x)
-#define DBL_MIN 2.2250738585072014e-308
-#define DBL_MAX 1.7976931348623158e+308
 
 void FdSystem::initFd(Fd& fd, const Image& im) noexcept {
-
     fd.image = const_cast<Image*>(&im);
     fd.imgWidth = im.width;
     fd.imgHeight = im.height;
@@ -16,7 +14,7 @@ void FdSystem::initFd(Fd& fd, const Image& im) noexcept {
     fd.img = new Complex[fd.height * fd.width];
     fd.original = new Complex[fd.height * fd.width];
 
-    fft2d(fd, true);
+    transformToFrequencyDomain(fd);
     shifting(fd);
 }
 
@@ -25,20 +23,19 @@ void FdSystem::destroyFd(Fd& fd) noexcept {
     delete[] fd.original;
 }
 
-
-void FdSystem::fft(Complex* x, int size,bool invert) noexcept {
+void FdSystem::fft(Complex* x, int size, bool invert) noexcept {
     if (size <= 1) return;
 
-    Complex* even = new Complex[size / 2];
-    Complex* odd = new Complex[size / 2];
+    std::vector<Complex> even(size / 2);
+    std::vector<Complex> odd(size / 2);
 
     for (int i = 0; i < size / 2; i++) {
         even[i] = x[2 * i];
         odd[i] = x[2 * i + 1];
     }
 
-    fft(even, size / 2);
-    fft(odd, size / 2);
+    fft(even.data(), size / 2, invert);
+    fft(odd.data(), size / 2, invert);
 
     double angle = 2 * M_PI / size * (invert ? -1 : 1);
     Complex w(1);
@@ -47,34 +44,29 @@ void FdSystem::fft(Complex* x, int size,bool invert) noexcept {
     for (int i = 0; i < size / 2; i++) {
         x[i] = even[i] + w * odd[i];
         x[i + size / 2] = even[i] - w * odd[i];
-        if (invert)
-        {
+        if (invert) {
             x[i] /= 2;
             x[i + size / 2] /= 2;
         }
         w *= wn;
     }
-
-    delete[] even;
-    delete[] odd;
 }
 
-void FdSystem::fft2d(Fd& fd,bool inverse) noexcept {
+void FdSystem::fft2d(Fd& fd, bool invert) noexcept {
     for (int y = 0; y < fd.height; y++) {
-        fft(&fd.img[y * fd.width], fd.width,inverse);
+        fft(&fd.img[y * fd.width], fd.width, invert);
     }
 
-    Complex* column = new Complex[fd.height];
+    std::vector<Complex> column(fd.height);
     for (int x = 0; x < fd.width; x++) {
         for (int y = 0; y < fd.height; y++) {
             column[y] = fd.img[y * fd.width + x];
         }
-        fft(column, fd.height,inverse);
+        fft(column.data(), fd.height, invert);
         for (int y = 0; y < fd.height; y++) {
             fd.img[y * fd.width + x] = column[y];
         }
     }
-    delete[] column;
 }
 
 void FdSystem::transformToFrequencyDomain(Fd& fd) noexcept {
@@ -88,143 +80,170 @@ void FdSystem::transformToFrequencyDomain(Fd& fd) noexcept {
     
     fft2d(fd);
     
-    for (int i = 0; i < (fd.height * fd.width); i++) {
-        fd.original[i] = fd.img[i];
-    }
+    std::copy_n(fd.img, fd.height * fd.width, fd.original);
 }
 
-
-bool FdSystem::writeSpectrumLogScale(const Fd& fd, std::string_view fileName) noexcept {
+bool FdSystem::writeSpectrumLogScale(Fd& fd, std::string_view fileName) noexcept {
     std::cout << "Starting to write spectrum log scale..." << std::endl;
+    const int byteDepth = 3;
+    size_t bufferSize = fd.height * fd.width * byteDepth;
+    std::vector<unsigned char> buf(bufferSize);
 
-    unsigned char *buf = new unsigned char[fd.imgHeight * fd.imgWidth * (fd.image->bitDepth / BYTE)];
+    double max = -std::numeric_limits<double>::infinity();
+    double min = std::numeric_limits<double>::infinity();
 
-    double maxMagnitude = DBL_MIN;
-    for (int y = 0; y < fd.imgHeight; y++) {
-        for (int x = 0; x < fd.imgWidth; x++) {
-            double magnitude = std::abs(fd.img[y * fd.width + x]);
-            if (magnitude > maxMagnitude) maxMagnitude = magnitude;
-        }
+    // First pass: find min and max of log magnitude
+    for (int i = 0; i < fd.height * fd.width; ++i) {
+        double magnitude = std::abs(fd.img[i]);
+        double logMagnitude = magnitude > 1.0 ? std::log10(magnitude) : 0.0;
+        max = std::max(max, logMagnitude);
+        min = std::min(min, logMagnitude);
     }
 
-    double logMax = std::log(1 + maxMagnitude);
+    std::cout << "Spectrum range: min = " << min << ", max = " << max << std::endl;
 
-    for (int y = 0; y < fd.imgHeight; y++) {
-        for (int x = 0; x < fd.imgWidth; x++) {
-            double magnitude = std::abs(fd.img[y * fd.width + x]);
-            double logMagnitude = std::log(1 + magnitude);
-            int color = static_cast<int>(255 * logMagnitude / logMax);
-            int i = (y * fd.imgWidth + x) * (fd.image->bitDepth / BYTE);
-            buf[i] = color;
-            buf[i + 1] = color;
-            buf[i + 2] = color;
-        }
+    // Second pass: normalize and fill buffer
+    double scale = 255.0 / (max - min);
+    for (int i = 0; i < fd.height * fd.width; ++i) {
+        double magnitude = std::abs(fd.img[i]);
+        double logMagnitude = magnitude > 1.0 ? std::log10(magnitude) : 0.0;
+        int color = static_cast<int>((logMagnitude - min) * scale);
+        color = std::clamp(color, 0, 255);
+        buf[i * byteDepth] = buf[i * byteDepth + 1] = buf[i * byteDepth + 2] = color;
     }
 
-    FILE *fo = fopen(fileName.data(), "wb");
-    if (fo == nullptr) {
-        std::cout << "Unable to create file" << std::endl;
-        delete[] buf;
-        return false;
-    }
-
-    fwrite(fd.image->header, sizeof(unsigned char), BMP_HEADER_SIZE, fo);
-    if (fd.image->bitDepth <= 8) {
-        fwrite(fd.image->colorTable, sizeof(unsigned char), BMP_COLOR_TABLE_SIZE, fo);
-    }
-
-    for (int i = 0; i < fd.imgHeight; i++) {
-        fwrite(buf + (i * fd.imgWidth * (fd.image->bitDepth / BYTE)), 
-               sizeof(unsigned char), 
-               (fd.imgWidth * (fd.image->bitDepth / BYTE)), 
-               fo);
-        if ((fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4 != 0) {
-            unsigned char padding[3] = {0, 0, 0};
-            fwrite(padding, sizeof(unsigned char), 
-                   (4 - (fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4), fo);
-        }
-    }
-
-    std::cout << "Image " << fileName << " has been written!" << std::endl;
-    fclose(fo);
-    delete[] buf;
-    return true;
+    return writeBufferToBMP(fd, fileName, buf.data(), bufferSize);
 }
 
-bool FdSystem::writePhase(const Fd& fd, std::string_view fileName) noexcept {
+bool FdSystem::writePhase(Fd& fd, std::string_view fileName) noexcept {
     std::cout << "Starting to write phase..." << std::endl;
+    const int byteDepth = 3;
+    size_t bufferSize = fd.height * fd.width * byteDepth;
+    std::vector<unsigned char> buf(bufferSize);
 
-    unsigned char *buf = new unsigned char[fd.imgHeight * fd.imgWidth * (fd.image->bitDepth / BYTE)];
+    const double min = -M_PI;
+    const double max = M_PI;
 
-    double max = DBL_MIN, min = DBL_MAX;
-    for (int y = 0; y < fd.imgHeight; y++) {
-        for (int x = 0; x < fd.imgWidth; x++) {
-            double phase = std::arg(fd.img[y * fd.width + x]);
-            if (phase > max) max = phase;
-            if (phase < min) min = phase;
-        }
+    std::cout << "Phase range: min = " << min << ", max = " << max << std::endl;
+
+    double scale = 255.0 / (max - min);
+    for (int i = 0; i < fd.height * fd.width; ++i) {
+        double phase = std::arg(fd.img[i]);
+        int color = static_cast<int>((phase - min) * scale);
+        color = std::clamp(color, 0, 255);
+        buf[i * byteDepth] = buf[i * byteDepth + 1] = buf[i * byteDepth + 2] = color;
     }
 
-    for (int y = 0; y < fd.imgHeight; y++) {
-        for (int x = 0; x < fd.imgWidth; x++) {
-            double phase = std::arg(fd.img[y * fd.width + x]);
-            phase = ((phase - min) * 255 / (max - min));
-            int color = static_cast<int>(phase);
-            int i = (y * fd.imgWidth + x) * (fd.image->bitDepth / BYTE);
-            buf[i] = color;
-            buf[i + 1] = color;
-            buf[i + 2] = color;
-        }
-    }
+    return writeBufferToBMP(fd, fileName, buf.data(), bufferSize);
+}
 
-    FILE *fo = fopen(fileName.data(), "wb");
-    if (fo == nullptr) {
+bool FdSystem::writeBufferToBMP(Fd& fd, std::string_view fileName, const unsigned char* buf, size_t bufferSize) noexcept {
+    FILE* fo = fopen(fileName.data(), "wb");
+    if (!fo) {
         std::cout << "Unable to create file" << std::endl;
-        delete[] buf;
         return false;
     }
 
-    fwrite(fd.image->header, sizeof(unsigned char), BMP_HEADER_SIZE, fo);
-    if (fd.image->bitDepth <= 8) {
-        fwrite(fd.image->colorTable, sizeof(unsigned char), BMP_COLOR_TABLE_SIZE, fo);
+    if (!fd.image->header) {
+        std::cout << "Image header is null" << std::endl;
+        fclose(fo);
+        return false;
     }
 
-    for (int i = 0; i < fd.imgHeight; i++) {
-        fwrite(buf + (i * fd.imgWidth * (fd.image->bitDepth / BYTE)), 
-               sizeof(unsigned char), 
-               (fd.imgWidth * (fd.image->bitDepth / BYTE)), 
-               fo);
-        if ((fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4 != 0) {
-            unsigned char padding[3] = {0, 0, 0};
-            fwrite(padding, sizeof(unsigned char), 
-                   (4 - (fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4), fo);
+    if (fwrite(fd.image->header, sizeof(uint8_t), BMP_HEADER_SIZE, fo) != BMP_HEADER_SIZE) {
+        std::cout << "Failed to write header" << std::endl;
+        fclose(fo);
+        return false;
+    }
+
+    if (fd.image->bitDepth <= 8 && fd.image->colorTable) {
+        if (fwrite(fd.image->colorTable, sizeof(uint8_t), BMP_COLOR_TABLE_SIZE, fo) != BMP_COLOR_TABLE_SIZE) {
+            std::cout << "Failed to write color table" << std::endl;
+            fclose(fo);
+            return false;
         }
     }
 
-    std::cout << "Image " << fileName << " has been written!" << std::endl;
+    const int byteDepth = 3;
+    for (int y = 0; y < fd.height; ++y) {
+        size_t rowSize = fd.width * byteDepth;
+        if (fwrite(buf + (y * rowSize), sizeof(unsigned char), rowSize, fo) != rowSize) {
+            std::cout << "Failed to write pixel data for row " << y << std::endl;
+            fclose(fo);
+            return false;
+        }
+
+        size_t paddingSize = (4 - (rowSize % 4)) % 4;
+        if (paddingSize > 0) {
+            unsigned char padding[3] = {0};
+            if (fwrite(padding, sizeof(unsigned char), paddingSize, fo) != paddingSize) {
+                std::cout << "Failed to write padding for row " << y << std::endl;
+                fclose(fo);
+                return false;
+            }
+        }
+    }
+
     fclose(fo);
-    delete[] buf;
+    std::cout << "Finished writing to file" << std::endl;
     return true;
 }
-
-
-
 
 void FdSystem::shifting(Fd& fd) noexcept {
-        int halfWidth = fd.width / 2;
-        int halfHeight = fd.height / 2;
-        for (int y = 0; y < halfHeight; y++) {
-            for (int x = 0; x < fd.width; x++) {
-                Complex temp = Complex(fd.img[y * fd.width + x].real(), fd.img[y * fd.width + x].imag());
-                fd.img[y * fd.width + x] = Complex(fd.img[(y + halfHeight) * fd.width + x].real(), fd.img[(y + halfHeight) * fd.width + x].imag());
-                fd.img[(y + halfHeight) * fd.width + x] = Complex(temp.real(), temp.imag());
-            }
-        }
+    const int halfWidth = fd.width / 2;
+    const int halfHeight = fd.height / 2;
+
+    std::vector<Complex> temp(std::max(fd.width, fd.height));
+
+    // Shift rows
+    for (int y = 0; y < fd.height; y++) {
+        std::copy_n(&fd.img[y * fd.width], fd.width, temp.begin());
+        std::rotate(temp.begin(), temp.begin() + halfWidth, temp.end());
+        std::copy_n(temp.begin(), fd.width, &fd.img[y * fd.width]);
+    }
+
+    // Shift columns
+    for (int x = 0; x < fd.width; x++) {
         for (int y = 0; y < fd.height; y++) {
-            for (int x = 0; x < halfWidth; x++) {
-                Complex temp = Complex(fd.img[y * fd.width + x].real(), fd.img[y * fd.width + x].imag());
-                fd.img[y * fd.width + x] = Complex(fd.img[y * fd.width + x + halfWidth].real(), fd.img[y * fd.width + x + halfWidth].imag());
-                fd.img[y * fd.width + x + halfWidth] = Complex(temp.real(), temp.imag());
-            }
+            temp[y] = fd.img[y * fd.width + x];
         }
+        std::rotate(temp.begin(), temp.begin() + halfHeight, temp.begin() + fd.height);
+        for (int y = 0; y < fd.height; y++) {
+            fd.img[y * fd.width + x] = temp[y];
+        }
+    }
+}
+
+void FdSystem::getInverse(Fd& fd) noexcept {
+    shifting(fd);
+    fft2d(fd, true);
+
+    for (int y = 0; y < fd.height; y++) {
+        for (int x = 0; x < fd.width; x++) {
+            int gray = static_cast<int>(fd.img[y * fd.width + x].real());
+            gray = std::clamp(gray, 0, 255);
+            int color = (gray << 16) | (gray << 8) | gray;
+            ImageSystem::setRGB(*fd.image, x, y, color);
+        }
+    }
+}
+void FdSystem::ILPF(Fd &fd,double radius) noexcept
+{
+    if (radius <= 0 || radius > std::min(fd.width/2, fd.height/2))
+    {
+        std::cout << "INVALID Radius!" << std::endl;
+        return;
+        }
+        int centerX = fd.width/2;
+        int centerY = fd.height/2;
+        for (int x = 0; x < fd.height; x++)
+        {
+         for (int y = 0; y < fd.width; y++)
+        {
+        if ((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY) > radius * radius)
+        {
+        fd.img[y * fd.width + x] = Complex(0, 0);
+        }
+    }
+    }
 }

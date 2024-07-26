@@ -284,11 +284,12 @@ void ImageSystem::unsharpMasking(Image& img) noexcept {
 
 
 
-Fd ImageSystem::getFrequencyDomain(const Image& img) noexcept {
-    Image tempImg = img;
+Fd &ImageSystem::getFrequencyDomain(const Image& img) noexcept {
+
+    static Image tempImg = img;
     convertToGrayscale(tempImg);
     
-    Fd fd;
+    static Fd fd;
     FdSystem::initFd(fd, tempImg);
     FdSystem::transformToFrequencyDomain(fd);
     

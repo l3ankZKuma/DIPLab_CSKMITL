@@ -1,5 +1,4 @@
-#include"pch.h"
-
+#include "pch.h"
 #include "ImageManager.h"
 #include "FrequencyDomainManager.h"
 
@@ -10,21 +9,33 @@ int main() {
     ImageSystem::initImage(image);
     ImageSystem::readImage(image, PATH_IMAGES "mandril.bmp");
 
+    const Fd &fd_bind = ImageSystem::getFrequencyDomain(image);
+    Fd fd = const_cast<Fd&>(fd_bind);
 
-    Fd fd = ImageSystem::getFrequencyDomain(image);
-    
-    FdSystem::writeSpectrumLogScale(fd, PATH_IMAGES "spectrum.bmp");
-    FdSystem::writePhase(fd, PATH_IMAGES "phase.bmp");
+    FdSystem::writeSpectrumLogScale(fd, PATH_IMAGES "mandril_spectrum.bmp");
+    FdSystem::writePhase(fd, PATH_IMAGES "mandril_phase.bmp");
 
+    std::array<double, 4> radius{3, 5, 10, 20};
 
-
-
-
-
+    for (int i = 0; i < radius.size(); ++i) {
+        // Create a string stream to build the filename
+        std::ostringstream ss;
+        
+        FdSystem::ILPF(fd, radius[i]);
+        
+        ss << PATH_IMAGES << "mandril_spectrum_ILPF" << static_cast<int>(radius[i]) << ".bmp";
+        FdSystem::writeSpectrumLogScale(fd, ss.str());
+        
+        ss.str("");
+        ss.clear();
+        ss << PATH_IMAGES << "mandril_phase_ILPF" << static_cast<int>(radius[i]) << ".bmp";
+        FdSystem::writePhase(fd, ss.str());
+        
+        std::copy_n(fd.original, fd.height * fd.width, fd.img);
+    }
 
     ImageSystem::destroyImage(image);
     FdSystem::destroyFd(fd);
-
 
     return 0;
 }

@@ -58,8 +58,16 @@
 			isa = PBXGroup;
 			children = (
 				D05299DD2C531CC500A33D4F /* main.cpp */,
+				D05299E42C531CE700A33D4F /* src */,
 			);
 			path = Lab5_Db;
+			sourceTree = "<group>";
+		};
+		D05299E42C531CE700A33D4F /* src */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
