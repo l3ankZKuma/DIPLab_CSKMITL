@@ -93,137 +93,119 @@ void FdSystem::transformToFrequencyDomain(Fd& fd) noexcept {
     }
 }
 
+
 bool FdSystem::writeSpectrumLogScale(const Fd& fd, std::string_view fileName) noexcept {
     std::cout << "Starting to write spectrum log scale..." << std::endl;
 
-    Image img;
-    ImageSystem::initImage(img);
-    img.width = fd.imgWidth;
-    img.height = fd.imgHeight;
-    img.bitDepth = 24;  // We're creating a 24-bit color image
+    unsigned char *buf = new unsigned char[fd.imgHeight * fd.imgWidth * (fd.image->bitDepth / BYTE)];
 
-    std::cout << "Image initialized with dimensions: " << img.width << "x" << img.height << std::endl;
-
-    // Copy the existing header
-    std::memcpy(img.header, fd.image->header, BMP_HEADER_SIZE);
-
-    // Update the width and height in the header
-    *reinterpret_cast<int*>(&img.header[18]) = img.width;
-    *reinterpret_cast<int*>(&img.header[22]) = img.height;
-
-    // Update the bit depth in the header
-    *reinterpret_cast<short*>(&img.header[28]) = img.bitDepth;
-
-    // Calculate and update the file size in the header
-    int fileSize = BMP_HEADER_SIZE + (img.width * img.height * 3);
-    *reinterpret_cast<int*>(&img.header[2]) = fileSize;
-
-    std::cout << "Header updated." << std::endl;
-
-    try {
-        img.buf = new uint8_t[img.width * img.height * 3];
-        std::cout << "Image buffer allocated." << std::endl;
-    } catch (const std::bad_alloc& e) {
-        std::cerr << "Memory allocation failed: " << e.what() << std::endl;
-        ImageSystem::destroyImage(img);
-        return false;
-    }
-
-    double maxMagnitude = 0;
+    double maxMagnitude = DBL_MIN;
     for (int y = 0; y < fd.imgHeight; y++) {
         for (int x = 0; x < fd.imgWidth; x++) {
-            Complex c = fd.img[y * fd.width + x];
-            double magnitude = std::abs(c);
+            double magnitude = std::abs(fd.img[y * fd.width + x]);
             if (magnitude > maxMagnitude) maxMagnitude = magnitude;
         }
     }
 
-    std::cout << "Max magnitude calculated: " << maxMagnitude << std::endl;
+    double logMax = std::log(1 + maxMagnitude);
 
     for (int y = 0; y < fd.imgHeight; y++) {
         for (int x = 0; x < fd.imgWidth; x++) {
-            Complex c = fd.img[y * fd.width + x];
-            double magnitude = std::abs(c);
-            int intensity = static_cast<int>(255 * std::log(1 + magnitude) / std::log(1 + maxMagnitude));
-
-            int index = (y * img.width + x) * 3;
-            img.buf[index] = intensity;
-            img.buf[index + 1] = intensity;
-            img.buf[index + 2] = intensity;
+            double magnitude = std::abs(fd.img[y * fd.width + x]);
+            double logMagnitude = std::log(1 + magnitude);
+            int color = static_cast<int>(255 * logMagnitude / logMax);
+            int i = (y * fd.imgWidth + x) * (fd.image->bitDepth / BYTE);
+            buf[i] = color;
+            buf[i + 1] = color;
+            buf[i + 2] = color;
         }
     }
 
-    std::cout << "Spectrum data processed." << std::endl;
+    FILE *fo = fopen(fileName.data(), "wb");
+    if (fo == nullptr) {
+        std::cout << "Unable to create file" << std::endl;
+        delete[] buf;
+        return false;
+    }
 
-    bool result = ImageSystem::writeImage(img, fileName);
-    std::cout << "Image writing " << (result ? "successful" : "failed") << std::endl;
+    fwrite(fd.image->header, sizeof(unsigned char), BMP_HEADER_SIZE, fo);
+    if (fd.image->bitDepth <= 8) {
+        fwrite(fd.image->colorTable, sizeof(unsigned char), BMP_COLOR_TABLE_SIZE, fo);
+    }
 
-    ImageSystem::destroyImage(img);
-    std::cout << "Temporary image destroyed." << std::endl;
+    for (int i = 0; i < fd.imgHeight; i++) {
+        fwrite(buf + (i * fd.imgWidth * (fd.image->bitDepth / BYTE)), 
+               sizeof(unsigned char), 
+               (fd.imgWidth * (fd.image->bitDepth / BYTE)), 
+               fo);
+        if ((fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4 != 0) {
+            unsigned char padding[3] = {0, 0, 0};
+            fwrite(padding, sizeof(unsigned char), 
+                   (4 - (fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4), fo);
+        }
+    }
 
-    return result;
+    std::cout << "Image " << fileName << " has been written!" << std::endl;
+    fclose(fo);
+    delete[] buf;
+    return true;
 }
 
 bool FdSystem::writePhase(const Fd& fd, std::string_view fileName) noexcept {
     std::cout << "Starting to write phase..." << std::endl;
 
-    Image img;
-    ImageSystem::initImage(img);
-    img.width = fd.imgWidth;
-    img.height = fd.imgHeight;
-    img.bitDepth = 24;  // We're creating a 24-bit color image
+    unsigned char *buf = new unsigned char[fd.imgHeight * fd.imgWidth * (fd.image->bitDepth / BYTE)];
 
-    std::cout << "Image initialized with dimensions: " << img.width << "x" << img.height << std::endl;
-
-    // Copy the existing header
-    std::memcpy(img.header, fd.image->header, BMP_HEADER_SIZE);
-
-    // Update the width and height in the header
-    *reinterpret_cast<int*>(&img.header[18]) = img.width;
-    *reinterpret_cast<int*>(&img.header[22]) = img.height;
-
-    // Update the bit depth in the header
-    *reinterpret_cast<short*>(&img.header[28]) = img.bitDepth;
-
-    // Calculate and update the file size in the header
-    int fileSize = BMP_HEADER_SIZE + (img.width * img.height * 3);
-    *reinterpret_cast<int*>(&img.header[2]) = fileSize;
-
-    std::cout << "Header updated." << std::endl;
-
-    try {
-        img.buf = new uint8_t[img.width * img.height * 3];
-        std::cout << "Image buffer allocated." << std::endl;
-    } catch (const std::bad_alloc& e) {
-        std::cerr << "Memory allocation failed: " << e.what() << std::endl;
-        ImageSystem::destroyImage(img);
-        return false;
+    double max = DBL_MIN, min = DBL_MAX;
+    for (int y = 0; y < fd.imgHeight; y++) {
+        for (int x = 0; x < fd.imgWidth; x++) {
+            double phase = std::arg(fd.img[y * fd.width + x]);
+            if (phase > max) max = phase;
+            if (phase < min) min = phase;
+        }
     }
 
     for (int y = 0; y < fd.imgHeight; y++) {
         for (int x = 0; x < fd.imgWidth; x++) {
-            Complex c = fd.img[y * fd.width + x];
-            double phase = std::arg(c);
-            int intensity = static_cast<int>((phase + M_PI) / (2 * M_PI) * 255);
-
-            int index = (y * img.width + x) * 3;
-            img.buf[index] = intensity;
-            img.buf[index + 1] = intensity;
-            img.buf[index + 2] = intensity;
+            double phase = std::arg(fd.img[y * fd.width + x]);
+            phase = ((phase - min) * 255 / (max - min));
+            int color = static_cast<int>(phase);
+            int i = (y * fd.imgWidth + x) * (fd.image->bitDepth / BYTE);
+            buf[i] = color;
+            buf[i + 1] = color;
+            buf[i + 2] = color;
         }
     }
 
-    std::cout << "Phase data processed." << std::endl;
+    FILE *fo = fopen(fileName.data(), "wb");
+    if (fo == nullptr) {
+        std::cout << "Unable to create file" << std::endl;
+        delete[] buf;
+        return false;
+    }
 
-    bool result = ImageSystem::writeImage(img, fileName);
-    std::cout << "Image writing " << (result ? "successful" : "failed") << std::endl;
+    fwrite(fd.image->header, sizeof(unsigned char), BMP_HEADER_SIZE, fo);
+    if (fd.image->bitDepth <= 8) {
+        fwrite(fd.image->colorTable, sizeof(unsigned char), BMP_COLOR_TABLE_SIZE, fo);
+    }
 
-    ImageSystem::destroyImage(img);
-    std::cout << "Temporary image destroyed." << std::endl;
+    for (int i = 0; i < fd.imgHeight; i++) {
+        fwrite(buf + (i * fd.imgWidth * (fd.image->bitDepth / BYTE)), 
+               sizeof(unsigned char), 
+               (fd.imgWidth * (fd.image->bitDepth / BYTE)), 
+               fo);
+        if ((fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4 != 0) {
+            unsigned char padding[3] = {0, 0, 0};
+            fwrite(padding, sizeof(unsigned char), 
+                   (4 - (fd.imgWidth * (fd.image->bitDepth / BYTE)) % 4), fo);
+        }
+    }
 
-    return result;
+    std::cout << "Image " << fileName << " has been written!" << std::endl;
+    fclose(fo);
+    delete[] buf;
+    return true;
 }
-
 
 
 
