@@ -500,8 +500,7 @@ int main() {
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{93, 124, 416, 332});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{196, 406, 320, 432});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{200, 416, 302, 437});
-    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{419, 204, 432, 229});
-    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{320, 274, 350, 285});
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{328, 275, 344, 300});
 
     auto modifyRegion = [&](const std::vector<int> &region,const std::vector<int> &newColor){
         for (int y = region[1]; y < region[3]; ++y) {
