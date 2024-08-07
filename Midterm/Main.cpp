@@ -89,7 +89,7 @@ void applyLaplacianFilter(Image& img) {
     int height = img.height;
     int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
     
-    std::vector<int> kernel = {0, 1, 0, 1, -4, 1, 0, 1, 0}; // Laplacian kernel
+    std::array<int,9> kernel = {0, 1, 0, 1, -4, 1, 0, 1, 0}; // Laplacian kernel
     int kernelSize = 3;
     int halfKernelSize = kernelSize / 2;
 
@@ -186,6 +186,51 @@ void floodFill(Image& img, int x, int y, const std::vector<int>& targetColor, co
     }
 }
 
+void boundaryFill(Image& img, int x, int y, const std::vector<int>& boundary, std::vector<int>& newColor, int limit) {
+    int width = img.width;
+    int height = img.height;
+    int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
+
+    std::vector<std::vector<bool>> visited(height, std::vector<bool>(width, false));
+    std::queue<std::pair<int, int>> q;
+    q.push({x, y});
+
+    while (!q.empty()) {
+        auto [curX, curY] = q.front();
+        q.pop();
+
+        if (curX < 0 || curX >= width || curY < 0 || curY >= height || visited[curY][curX]) {
+            continue;
+        }
+
+        int adjustedY = height - 1 - curY; // Adjust Y coordinate to start from bottom-left
+        int index = (adjustedY * width + curX) * channels;
+        int r = img.buf[index];
+        int g = img.buf[index + 1];
+        int b = img.buf[index + 2];
+
+        if (r >= boundary[0] && r <= boundary[1] && g >= boundary[2] && g <= boundary[3] && b >= boundary[4] && b <= boundary[5]) {
+            img.buf[index] = newColor[0];
+            img.buf[index + 1] = newColor[1];
+            img.buf[index + 2] = newColor[2];
+
+            visited[curY][curX] = true;
+
+            if (curX - 1 >= 0 && !visited[curY][curX - 1]) {
+                q.push({curX - 1, curY}); // Left
+            }
+            if (curX + 1 < width && !visited[curY][curX + 1]) {
+                q.push({curX + 1, curY}); // Right
+            }
+            if (curY - 1 >= 0 && !visited[curY - 1][curX]) {
+                q.push({curX, curY - 1}); // Up
+            }
+            if (curY + 1 < height && !visited[curY + 1][curX]) {
+                q.push({curX, curY + 1}); // Down
+            }
+        }
+    }
+}
 
 
 
@@ -345,34 +390,6 @@ int main() {
     }
 
     
-    //mustache 
-    std::vector<std::vector<int>> modifyRegions = {
-        {193, 332, 339, 400},
-        {230, 284, 273, 300},
-        {332, 332, 380, 392}
-    };
-
-    // Change color to red in modifyRegions using multithreading
-    auto modifyColorSkinMustache = [&](const std::vector<int>& region) {
-        for (int y = region[1]; y < region[3]; ++y) {
-            for (int x = region[0]; x < region[2]; ++x) {
-                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
-                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
-                img.buf[index] = 0; // Set red channel to 0 (black)
-                img.buf[index + 1] = 0; // Set green channel to 0 (black)
-                img.buf[index + 2] = 255; // Set blue channel to 255 (red)
-            }
-        }
-    };
-
-    std::vector<std::thread> threadsForModifySkinMustache ;
-    for (const auto& region : modifyRegions) {
-        threadsForModifySkinMustache .emplace_back(modifyColorSkinMustache , region);
-    }
-
-    for (auto& thread : threadsForModifySkinMustache ) {
-        thread.join();
-    }
 
 
     std::set<std::vector<int>> uniqueColors;
@@ -398,8 +415,32 @@ int main() {
 
     uniqueColors.insert(bgColor);
 
-    //modify
-    std::vector<int> modifyRegion1 = {79, 451, 440, 512}; // Region for the background starting from bottom-left
+
+        // Change color to red in modifyRegions using multithreading
+    auto modifyColorMustache = [&](const std::vector<int>& region) {
+        for (int y = region[1]; y < region[3]; ++y) {
+            for (int x = region[0]; x < region[2]; ++x) {
+                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
+                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
+                img.buf[index] = 0; // Set red channel to 0 (black)
+                img.buf[index + 1] = 0; // Set green channel to 0 (black)
+                img.buf[index + 2] = 255; // Set blue channel to 255 (red)
+            }
+        }
+    };
+
+    std::vector<std::thread> threadsForModifyMustache ;
+    threadsForModifyMustache.emplace_back(modifyColorMustache, std::vector<int>{193, 332, 339, 400});
+    threadsForModifyMustache.emplace_back(modifyColorMustache, std::vector<int>{230, 284, 273, 300});
+    threadsForModifyMustache.emplace_back(modifyColorMustache, std::vector<int>{332, 332, 380, 392});
+
+
+
+    for (auto& thread : threadsForModifyMustache ) {
+        thread.join();
+    }
+
+
 
     // Change color to blue in modifyRegion1 using multithreading
     auto modifyColorBackground = [&](const std::vector<int>& region) {
@@ -415,7 +456,7 @@ int main() {
     };
 
     std::vector<std::thread> threadsForModifyBackground;
-    threadsForModifyBackground.emplace_back(modifyColorBackground, modifyRegion1);
+    threadsForModifyBackground.emplace_back(modifyColorBackground, std::vector<int>{79, 451, 440, 512});
 
     for (auto& thread : threadsForModifyBackground) {
         thread.join();
@@ -445,6 +486,8 @@ int main() {
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{93, 124, 416, 332});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{196, 406, 320, 432});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{200, 416, 302, 437});
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{419, 204, 432, 229});
+
 
     for (auto& thread : threadsForModifySkin) {
         thread.join();
@@ -455,15 +498,17 @@ int main() {
 
 
    std::vector<std::thread> threadsForFloodFill;
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 256, 318, redColor, lightBrownColor, 250));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 407, 358, lightBrownColor, redColor, 10000));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 416, 300, lightBrownColor, redColor, 200));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 245, 443, bgColor, blueColor, 1000));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 280, 442, bgColor, blueColor, 10000));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 307, 435, bgColor, blueColor, 10000));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 320, 432, bgColor, blueColor,20));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 429, 221, bgColor, lightBrownColor,1000));
-    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 427, 204, bgColor, lightBrownColor,50));
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 124, 376, bgColor, redColor, 50);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 161, 387, bgColor, redColor, 50);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 256, 318, redColor, lightBrownColor, 250);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 407, 358, lightBrownColor, redColor, 10000);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 416, 300, lightBrownColor, redColor, 200);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 245, 443, bgColor, blueColor, 1000);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 280, 442, bgColor, blueColor, 10000);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 307, 435, bgColor, blueColor, 10000);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 320, 432, bgColor, blueColor,20);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 429, 221, bgColor, lightBrownColor,1000);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 427, 204, bgColor, lightBrownColor,50);
 
 
 
