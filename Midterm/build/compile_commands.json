@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xclang -emit-pch -Xclang -include -Xclang /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx -x c++-header -o CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx.pch -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx.cxx",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx.cxx",
+  "output": "CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx.pch"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx -o CMakeFiles/Midterm.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/Main.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/Main.cpp",
+  "output": "CMakeFiles/Midterm.dir/Main.cpp.o"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx -o CMakeFiles/Midterm.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/ImageManager.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/ImageManager.cpp",
+  "output": "CMakeFiles/Midterm.dir/src/ImageManager.cpp.o"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build",
+  "command": "/usr/bin/clang++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx -o CMakeFiles/Midterm.dir/src/FrequencyDomainManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/FrequencyDomainManager.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/FrequencyDomainManager.cpp",
+  "output": "CMakeFiles/Midterm.dir/src/FrequencyDomainManager.cpp.o"
+}
+]
