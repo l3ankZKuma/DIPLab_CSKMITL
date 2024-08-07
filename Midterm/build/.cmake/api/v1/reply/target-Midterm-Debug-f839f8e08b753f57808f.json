@@ -34,25 +34,25 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 38,
+				"line" : 37,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 30,
+				"line" : 29,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 27,
+				"line" : 26,
 				"parent" : 0
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 35,
+				"line" : 34,
 				"parent" : 0
 			}
 		]
@@ -171,8 +171,7 @@
 			"sourceIndexes" : 
 			[
 				1,
-				2,
-				3
+				2
 			]
 		}
 	],
@@ -208,15 +207,14 @@
 			[
 				0,
 				1,
-				2,
-				3
+				2
 			]
 		},
 		{
 			"name" : "Precompile Header File",
 			"sourceIndexes" : 
 			[
-				4
+				3
 			]
 		}
 	],
@@ -238,12 +236,6 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 1,
 			"path" : "src/ImageManager.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 1,
-			"path" : "src/FrequencyDomainManager.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

@@ -1,6 +1,5 @@
 #include"pch.h"
 #include "ImageManager.h"
-#include"FrequencyDomainManager.h"
 
 
 void ImageSystem::initImage(Image& img) noexcept {
@@ -286,17 +285,6 @@ void ImageSystem::unsharpMasking(Image& img) noexcept {
 
 
 
-Fd &ImageSystem::getFrequencyDomain(const Image& img) noexcept {
-
-    static Image tempImg = img;
-    convertToGrayscale(tempImg);
-    
-    static Fd fd;
-    FdSystem::initFd(fd, tempImg);
-    FdSystem::transformToFrequencyDomain(fd);
-    
-    return fd;
-}
 
 template<auto percent>
 void ImageSystem::addSaltNoise(Image &img) noexcept {

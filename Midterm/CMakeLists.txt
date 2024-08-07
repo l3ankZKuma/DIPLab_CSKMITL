@@ -20,7 +20,6 @@ set(IMAGES_DIR "${CMAKE_SOURCE_DIR}/images")
 add_executable(Midterm
     Main.cpp
     src/ImageManager.cpp
-    src/FrequencyDomainManager.cpp
 )
 
 # Include directories

@@ -156,26 +156,33 @@ int main() {
     }
 
     // Apply adaptive median filter
-    for (int i = 0; i < (1 << 6); ++i) {
+    for (int i = 0; i < (1 << 5); ++i) {
         adaptiveMedianFilter<3>(img);
     }
 
 
     // Apply adaptive median filter
-    for (int i = 0; i < (1 << 6); ++i) {
+    for (int i = 0; i < (1 << 5); ++i) {
         adaptiveMedianFilter<5>(img);
     }
 
 
     // Apply adaptive median filter
-    for (int i = 0; i < (1 << 6); ++i) {
+    for (int i = 0; i < (1 << 5); ++i) {
         adaptiveMedianFilter<7>(img);
     }
+
+    // Apply adaptive median filter
+    for (int i = 0; i < (1 << 5); ++i) {
+        adaptiveMedianFilter<11>(img);
+    }
+
 
 
 
     // Apply Laplacian filter
     applyLaplacianFilter(img);
+
 
     // Define the region of the shirt and the color ranges (based on the histogram analysis)
     std::vector<int> hairRegion = {50, 0, 480, 183}; // Region for the shirt starting from bottom-left
@@ -200,7 +207,7 @@ int main() {
     changeColor(img, mouseRegion, lightBrownColor, mouseColorRange);
 
 
-    std::vector<int> mustacheRegion = {90, 277, 438, 405}; // Region for the mustache starting from bottom-left
+    std::vector<int> mustacheRegion = {90, 277, 420, 408}; // Region for the mustache starting from bottom-left
     std::vector<int> redColor = {255, 0, 0};
     std::vector<std::vector<int>> mustacheColorRange = {{0, 150}, {150,255}, {0, 150}}; // Example color range for the shirt
     std::reverse(redColor.begin(), redColor.end());
@@ -219,7 +226,6 @@ int main() {
     std::vector<std::vector<int>> bgColorRange = {{150, 255}, {100, 255}, {100, 150}}; // Example color range for the background
     std::reverse(bgColorRange.begin(), bgColorRange.end());
     std::reverse(bgColor.begin(), bgColor.end());
-    //changeColor(img, bgRegion, bgColor, bgColorRange);
 
 
     //glass
@@ -378,6 +384,7 @@ int main() {
     }
 
     // Check and change color to lightBrown if it is bgColor in modifyRegion3
+
 
 
 

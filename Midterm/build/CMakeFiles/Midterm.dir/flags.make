@@ -16,5 +16,3 @@ CXX_FLAGS = -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/
 
 # PCH options: CMakeFiles/Midterm.dir/src/ImageManager.cpp.o_OPTIONS = -Winvalid-pch;;-Xarch_arm64;-include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx
 
-# PCH options: CMakeFiles/Midterm.dir/src/FrequencyDomainManager.cpp.o_OPTIONS = -Winvalid-pch;;-Xarch_arm64;-include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/build/CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx
-

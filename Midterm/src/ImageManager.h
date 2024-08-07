@@ -25,7 +25,6 @@ struct Image {
 struct ImageSystem {
     static void initImage(Image& img) noexcept;
     static void destroyImage(Image& img) noexcept;
-    static Fd& getFrequencyDomain(const Image& img) noexcept;
 
     [[nodiscard]] static bool readImage(Image& img, std::string_view fileName) noexcept;
 

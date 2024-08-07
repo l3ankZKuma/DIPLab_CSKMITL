@@ -168,30 +168,6 @@ cmake_pch_arm64.hxx.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Midterm.dir/build.make CMakeFiles/Midterm.dir/cmake_pch_arm64.hxx.s
 .PHONY : cmake_pch_arm64.hxx.s
 
-src/FrequencyDomainManager.o: src/FrequencyDomainManager.cpp.o
-.PHONY : src/FrequencyDomainManager.o
-
-# target to build an object file
-src/FrequencyDomainManager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Midterm.dir/build.make CMakeFiles/Midterm.dir/src/FrequencyDomainManager.cpp.o
-.PHONY : src/FrequencyDomainManager.cpp.o
-
-src/FrequencyDomainManager.i: src/FrequencyDomainManager.cpp.i
-.PHONY : src/FrequencyDomainManager.i
-
-# target to preprocess a source file
-src/FrequencyDomainManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Midterm.dir/build.make CMakeFiles/Midterm.dir/src/FrequencyDomainManager.cpp.i
-.PHONY : src/FrequencyDomainManager.cpp.i
-
-src/FrequencyDomainManager.s: src/FrequencyDomainManager.cpp.s
-.PHONY : src/FrequencyDomainManager.s
-
-# target to generate assembly for a file
-src/FrequencyDomainManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Midterm.dir/build.make CMakeFiles/Midterm.dir/src/FrequencyDomainManager.cpp.s
-.PHONY : src/FrequencyDomainManager.cpp.s
-
 src/ImageManager.o: src/ImageManager.cpp.o
 .PHONY : src/ImageManager.o
 
@@ -231,9 +207,6 @@ help:
 	@echo "... cmake_pch_arm64.hxx.pch"
 	@echo "... cmake_pch_arm64.hxx.i"
 	@echo "... cmake_pch_arm64.hxx.s"
-	@echo "... src/FrequencyDomainManager.o"
-	@echo "... src/FrequencyDomainManager.i"
-	@echo "... src/FrequencyDomainManager.s"
 	@echo "... src/ImageManager.o"
 	@echo "... src/ImageManager.i"
 	@echo "... src/ImageManager.s"

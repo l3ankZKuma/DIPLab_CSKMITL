@@ -851,5 +851,4 @@ CMakeFiles/Midterm.dir/src/ImageManager.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__type_traits/remove_const_ref.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/set \
   /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/ImageManager.cpp \
-  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/ImageManager.h \
-  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/FrequencyDomainManager.h
+  /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Midterm/src/ImageManager.h
