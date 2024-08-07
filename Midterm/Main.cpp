@@ -187,7 +187,7 @@ int main() {
 
 
 
-    std::vector<int> skinRegion = {80,128, 512-69, 450}; // Region for the skin starting from bottom-left
+    std::vector<int> skinRegion = {80,133, 512-69, 450}; // Region for the skin starting from bottom-left
     std::vector<int> lightBrownColor = {196, 164, 132};
     std::vector<std::vector<int>> skinColorRange = {{70, 160},{150,255}, {150, 220} }; // Example color range for the skin
     std::reverse(lightBrownColor.begin(), lightBrownColor.end());
@@ -291,6 +291,27 @@ int main() {
             }
         }
     }
+
+    //mustache
+    std::vector<std::vector<int>> modifyRegions = {
+        {193, 332, 339, 403},
+        {230, 284, 273, 304}
+    };
+
+    // Change color to red in modifyRegions
+    for (const auto& region : modifyRegions) {
+        for (int y = region[1]; y < region[3]; ++y) {
+            for (int x = region[0]; x < region[2]; ++x) {
+                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
+                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
+                img.buf[index] = 0; // Set red channel to 0 (black)
+                img.buf[index + 1] = 0; // Set green channel to 0 (black)
+                img.buf[index + 2] = 255; // Set blue channel to 255 (red)
+            }
+        }
+    }
+
+    
 
 
 
