@@ -16,7 +16,8 @@
 #include <random>
 #include<map>
 #include<set>
-
-
+#include<queue>
+#include<stack>
+#include<thread>
 
 #endif // PCH_H

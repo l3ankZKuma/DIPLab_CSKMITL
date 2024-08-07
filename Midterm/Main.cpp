@@ -142,7 +142,52 @@ void changeColor(Image& img, const std::vector<int>& region, const std::vector<i
             }
         }
     }
+
 }  
+
+
+void floodFill(Image& img, int x, int y, const std::vector<int>& targetColor, const std::vector<int>& fillColor, int maxFillCount) {
+    int width = img.width;
+    int height = img.height;
+    int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
+
+    std::vector<std::vector<bool>> visited(height, std::vector<bool>(width, false));
+    std::queue<std::pair<int, int>> q;
+    q.push({x, y});
+    int fillCount = 0;
+
+    while (!q.empty() && fillCount < maxFillCount) {
+        auto [curX, curY] = q.front();
+        q.pop();
+
+        if (curX < 0 || curX >= width || curY < 0 || curY >= height || visited[curY][curX]) {
+            continue;
+        }
+
+        int adjustedY = height - 1 - curY; // Adjust Y coordinate to start from bottom-left
+        int index = (adjustedY * width + curX) * channels;
+        int r = img.buf[index];
+        int g = img.buf[index + 1];
+        int b = img.buf[index + 2];
+
+        if (r == targetColor[0] && g == targetColor[1] && b == targetColor[2]) {
+            img.buf[index] = fillColor[0];
+            img.buf[index + 1] = fillColor[1];
+            img.buf[index + 2] = fillColor[2];
+            ++fillCount;
+
+            visited[curY][curX] = true;
+
+            q.push({curX - 1, curY}); // Left
+            q.push({curX + 1, curY}); // Right
+            q.push({curX, curY - 1}); // Up
+            q.push({curX, curY + 1}); // Down
+        }
+    }
+}
+
+
+
 
 int main() {
     std::string inputFileName = PATH_IMAGES "gamemaster_noise_2024.bmp";
@@ -172,6 +217,7 @@ int main() {
         adaptiveMedianFilter<7>(img);
     }
 
+    
     // Apply adaptive median filter
     for (int i = 0; i < (1 << 5); ++i) {
         adaptiveMedianFilter<11>(img);
@@ -235,7 +281,7 @@ int main() {
     changeColor(img, glassRegion, glassColor, glassColorRange);
 
     //diagonal 1,2
-    std::vector<int> diagonal1Region = {153, 200, 212, 257}; // Region for the diagonal1 starting from bottom-left
+    std::vector<int> diagonal1Region = {153, 200, 212, 255}; // Region for the diagonal1 starting from bottom-left
     std::vector<int> diagonal2Region = {314,204, 366, 255}; // Region for the diagonal2 starting from bottom-left
     std::vector<int> diagonalColor = {255, 255, 255};
 
@@ -299,14 +345,15 @@ int main() {
     }
 
     
-    //mustache
+    //mustache 
     std::vector<std::vector<int>> modifyRegions = {
         {193, 332, 339, 400},
-        {230, 284, 273, 300}
+        {230, 284, 273, 300},
+        {332, 332, 380, 392}
     };
 
-    // Change color to red in modifyRegions
-    for (const auto& region : modifyRegions) {
+    // Change color to red in modifyRegions using multithreading
+    auto modifyColorSkinMustache = [&](const std::vector<int>& region) {
         for (int y = region[1]; y < region[3]; ++y) {
             for (int x = region[0]; x < region[2]; ++x) {
                 int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
@@ -316,11 +363,16 @@ int main() {
                 img.buf[index + 2] = 255; // Set blue channel to 255 (red)
             }
         }
+    };
+
+    std::vector<std::thread> threadsForModifySkinMustache ;
+    for (const auto& region : modifyRegions) {
+        threadsForModifySkinMustache .emplace_back(modifyColorSkinMustache , region);
     }
 
-    
-
-
+    for (auto& thread : threadsForModifySkinMustache ) {
+        thread.join();
+    }
 
 
     std::set<std::vector<int>> uniqueColors;
@@ -349,24 +401,30 @@ int main() {
     //modify
     std::vector<int> modifyRegion1 = {79, 451, 440, 512}; // Region for the background starting from bottom-left
 
-    // Change color to blue in modifyRegion1
-    for (int y = modifyRegion1[1]; y < modifyRegion1[3]; ++y) {
-        for (int x = modifyRegion1[0]; x < modifyRegion1[2]; ++x) {
-            int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
-            int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
-            img.buf[index] = 255; // Set red channel to 0 (black)
-            img.buf[index + 1] = 0; // Set green channel to 0 (black)
-            img.buf[index + 2] = 0; // Set blue channel to 255 (blue)
+    // Change color to blue in modifyRegion1 using multithreading
+    auto modifyColorBackground = [&](const std::vector<int>& region) {
+        for (int y = region[1]; y < region[3]; ++y) {
+            for (int x = region[0]; x < region[2]; ++x) {
+                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
+                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
+                img.buf[index] = 255; // Set red channel to 0 (black)
+                img.buf[index + 1] = 0; // Set green channel to 0 (black)
+                img.buf[index + 2] = 0; // Set blue channel to 255 (blue)
+            }
         }
+    };
+
+    std::vector<std::thread> threadsForModifyBackground;
+    threadsForModifyBackground.emplace_back(modifyColorBackground, modifyRegion1);
+
+    for (auto& thread : threadsForModifyBackground) {
+        thread.join();
     }
 
 
-    //skin change bg color to skin
-    std::vector<int> modifyRegion2 = {93, 124, 416, 332}; 
-    std::vector<int> modifyRegion3 = {196, 406, 320, 432};
 
     // Check and change color to lightBrown if it is bgColor in modifyRegion2 and modifyRegion3
-    for (const auto& region : {modifyRegion2, modifyRegion3}) {
+    auto modifyColorSkin = [&](const std::vector<int>& region) {
         for (int y = region[1]; y < region[3]; ++y) {
             for (int x = region[0]; x < region[2]; ++x) {
                 int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
@@ -381,9 +439,38 @@ int main() {
                 }
             }
         }
+    };
+
+    std::vector<std::thread> threadsForModifySkin;
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{93, 124, 416, 332});
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{196, 406, 320, 432});
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{200, 416, 302, 437});
+
+    for (auto& thread : threadsForModifySkin) {
+        thread.join();
     }
 
-    // Check and change color to lightBrown if it is bgColor in modifyRegion3
+
+
+
+
+   std::vector<std::thread> threadsForFloodFill;
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 256, 318, redColor, lightBrownColor, 250));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 407, 358, lightBrownColor, redColor, 10000));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 416, 300, lightBrownColor, redColor, 200));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 245, 443, bgColor, blueColor, 1000));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 280, 442, bgColor, blueColor, 10000));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 307, 435, bgColor, blueColor, 10000));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 320, 432, bgColor, blueColor,20));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 429, 221, bgColor, lightBrownColor,1000));
+    threadsForFloodFill.push_back(std::thread(floodFill, std::ref(img), 427, 204, bgColor, lightBrownColor,50));
+
+
+
+    for(auto& thread: threadsForFloodFill){
+        thread.join();
+    }
+
 
 
 
