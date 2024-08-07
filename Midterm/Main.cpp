@@ -15,70 +15,89 @@ void adaptiveMedianFilter(Image& img) {
     int width = img.width;
     int height = img.height;
     int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
-    
-    std::vector<uint8_t> output(img.width * img.height * channels);
-    std::array<int, maxWindowSize * maxWindowSize> windowR, windowG, windowB;
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            bool done = false;
-            int windowSize = 1;
-            
-            while (!done && windowSize <= maxWindowSize) {
-                int halfSize = windowSize / 2;
-                size_t count = 0;
-                
-                for (int dy = -halfSize; dy <= halfSize; ++dy) {
-                    for (int dx = -halfSize; dx <= halfSize; ++dx) {
-                        int nx = std::clamp(x + dx, 0, width - 1);
-                        int ny = std::clamp(y + dy, 0, height - 1);
-                        int index = (ny * width + nx) * channels;
-                        windowR[count] = img.buf[index];
-                        windowG[count] = img.buf[index + 1];
-                        windowB[count] = img.buf[index + 2];
-                        ++count;
+    std::vector<uint8_t> output(img.width * img.height * channels);
+    int numThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    std::mutex mtx;
+
+    auto processChunk = [&](int startY, int endY) {
+        std::array<int, maxWindowSize * maxWindowSize> windowR, windowG, windowB;
+
+        for (int y = startY; y < endY; ++y) {
+            for (int x = 0; x < width; ++x) {
+                bool done = false;
+                int windowSize = 1;
+
+                while (!done && windowSize <= maxWindowSize) {
+                    int halfSize = windowSize / 2;
+                    size_t count = 0;
+
+                    for (int dy = -halfSize; dy <= halfSize; ++dy) {
+                        for (int dx = -halfSize; dx <= halfSize; ++dx) {
+                            int nx = std::clamp(x + dx, 0, width - 1);
+                            int ny = std::clamp(y + dy, 0, height - 1);
+                            int index = (ny * width + nx) * channels;
+                            windowR[count] = img.buf[index];
+                            windowG[count] = img.buf[index + 1];
+                            windowB[count] = img.buf[index + 2];
+                            ++count;
+                        }
                     }
-                }
-                
-                int medianR = findMedian(windowR, count);
-                int medianG = findMedian(windowG, count);
-                int medianB = findMedian(windowB, count);
-                
-                int zMinR = *std::min_element(windowR.begin(), windowR.begin() + count);
-                int zMaxR = *std::max_element(windowR.begin(), windowR.begin() + count);
-                int zMinG = *std::min_element(windowG.begin(), windowG.begin() + count);
-                int zMaxG = *std::max_element(windowG.begin(), windowG.begin() + count);
-                int zMinB = *std::min_element(windowB.begin(), windowB.begin() + count);
-                int zMaxB = *std::max_element(windowB.begin(), windowB.begin() + count);
-                
-                int index = (y * width + x) * channels;
-                int zR = img.buf[index];
-                int zG = img.buf[index + 1];
-                int zB = img.buf[index + 2];
-                
-                if (medianR > zMinR && medianR < zMaxR && medianG > zMinG && medianG < zMaxG && medianB > zMinB && medianB < zMaxB) {
-                    if (zR > zMinR && zR < zMaxR && zG > zMinG && zG < zMaxG && zB > zMinB && zB < zMaxB) {
-                        output[index] = zR;
-                        output[index + 1] = zG;
-                        output[index + 2] = zB;
+
+                    int medianR = findMedian(windowR, count);
+                    int medianG = findMedian(windowG, count);
+                    int medianB = findMedian(windowB, count);
+
+                    int zMinR = *std::min_element(windowR.begin(), windowR.begin() + count);
+                    int zMaxR = *std::max_element(windowR.begin(), windowR.begin() + count);
+                    int zMinG = *std::min_element(windowG.begin(), windowG.begin() + count);
+                    int zMaxG = *std::max_element(windowG.begin(), windowG.begin() + count);
+                    int zMinB = *std::min_element(windowB.begin(), windowB.begin() + count);
+                    int zMaxB = *std::max_element(windowB.begin(), windowB.begin() + count);
+
+                    int index = (y * width + x) * channels;
+                    int zR = img.buf[index];
+                    int zG = img.buf[index + 1];
+                    int zB = img.buf[index + 2];
+
+                    std::lock_guard<std::mutex> lock(mtx);
+                    if (medianR > zMinR && medianR < zMaxR && medianG > zMinG && medianG < zMaxG && medianB > zMinB && medianB < zMaxB) {
+                        if (zR > zMinR && zR < zMaxR && zG > zMinG && zG < zMaxG && zB > zMinB && zB < zMaxB) {
+                            output[index] = zR;
+                            output[index + 1] = zG;
+                            output[index + 2] = zB;
+                        } else {
+                            output[index] = medianR;
+                            output[index + 1] = medianG;
+                            output[index + 2] = medianB;
+                        }
+                        done = true;
                     } else {
-                        output[index] = medianR;
-                        output[index + 1] = medianG;
-                        output[index + 2] = medianB;
+                        windowSize += 2;
                     }
-                    done = true;
-                } else {
-                    windowSize += 2;
                 }
-            }
-            
-            if (!done) {
-                int index = (y * width + x) * channels;
-                output[index] = img.buf[index];
-                output[index + 1] = img.buf[index + 1];
-                output[index + 2] = img.buf[index + 2];
+
+                if (!done) {
+                    std::lock_guard<std::mutex> lock(mtx);
+                    int index = (y * width + x) * channels;
+                    output[index] = img.buf[index];
+                    output[index + 1] = img.buf[index + 1];
+                    output[index + 2] = img.buf[index + 2];
+                }
             }
         }
+    };
+
+    int chunkSize = height / numThreads;
+    for (int i = 0; i < numThreads; ++i) {
+        int startY = i * chunkSize;
+        int endY = (i == numThreads - 1) ? height : startY + chunkSize;
+        threads.emplace_back(processChunk, startY, endY);
+    }
+
+    for (auto& t : threads) {
+        t.join();
     }
 
     std::copy(output.begin(), output.end(), img.buf);
@@ -89,38 +108,55 @@ void applyLaplacianFilter(Image& img) {
     int height = img.height;
     int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
     
-    std::array<int,9> kernel = {0, 1, 0, 1, -4, 1, 0, 1, 0}; // Laplacian kernel
+    std::array<int, 9> kernel = {0, 1, 0, 1, -4, 1, 0, 1, 0}; // Laplacian kernel
     int kernelSize = 3;
     int halfKernelSize = kernelSize / 2;
 
     std::vector<uint8_t> output(img.width * img.height * channels);
+    int numThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    std::mutex mtx;
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int index = (y * width + x) * channels;
+    auto processChunk = [&](int startY, int endY) {
+        for (int y = startY; y < endY; ++y) {
+            for (int x = 0; x < width; ++x) {
+                int index = (y * width + x) * channels;
 
-            for (int c = 0; c < channels; ++c) {
-                int sum = 0;
+                for (int c = 0; c < channels; ++c) {
+                    int sum = 0;
 
-                for (int ky = -halfKernelSize; ky <= halfKernelSize; ++ky) {
-                    for (int kx = -halfKernelSize; kx <= halfKernelSize; ++kx) {
-                        int ny = std::clamp(y + ky, 0, height - 1);
-                        int nx = std::clamp(x + kx, 0, width - 1);
-                        int nIndex = (ny * width + nx) * channels + c;
-                        int kIndex = (ky + halfKernelSize) * kernelSize + (kx + halfKernelSize);
+                    for (int ky = -halfKernelSize; ky <= halfKernelSize; ++ky) {
+                        for (int kx = -halfKernelSize; kx <= halfKernelSize; ++kx) {
+                            int ny = std::clamp(y + ky, 0, height - 1);
+                            int nx = std::clamp(x + kx, 0, width - 1);
+                            int nIndex = (ny * width + nx) * channels + c;
+                            int kIndex = (ky + halfKernelSize) * kernelSize + (kx + halfKernelSize);
 
-                        sum += img.buf[nIndex] * kernel[kIndex];
+                            sum += img.buf[nIndex] * kernel[kIndex];
+                        }
                     }
-                }
 
-                int newValue = img.buf[index + c] - sum;
-                output[index + c] = std::clamp(newValue, 0, 255);
+                    int newValue = img.buf[index + c] - sum;
+                    output[index + c] = std::clamp(newValue, 0, 255);
+                }
             }
         }
+    };
+
+    int chunkSize = height / numThreads;
+    for (int i = 0; i < numThreads; ++i) {
+        int startY = i * chunkSize;
+        int endY = (i == numThreads - 1) ? height : startY + chunkSize;
+        threads.emplace_back(processChunk, startY, endY);
+    }
+
+    for (auto& t : threads) {
+        t.join();
     }
 
     std::copy(output.begin(), output.end(), img.buf);
 }
+
 
 // Function to change colors based on histogram ranges
 void changeColor(Image& img, const std::vector<int>& region, const std::vector<int>& targetColor, const std::vector<std::vector<int>>& colorRange,const std::vector<int>& notChangeColor={}) {
@@ -186,52 +222,20 @@ void floodFill(Image& img, int x, int y, const std::vector<int>& targetColor, co
     }
 }
 
-void boundaryFill(Image& img, int x, int y, const std::vector<int>& boundary, std::vector<int>& newColor, int limit) {
-    int width = img.width;
-    int height = img.height;
-    int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
 
-    std::vector<std::vector<bool>> visited(height, std::vector<bool>(width, false));
-    std::queue<std::pair<int, int>> q;
-    q.push({x, y});
+void modifyRegion(Image &img,const std::vector<int> & region,const std::vector<int> &color){
 
-    while (!q.empty()) {
-        auto [curX, curY] = q.front();
-        q.pop();
-
-        if (curX < 0 || curX >= width || curY < 0 || curY >= height || visited[curY][curX]) {
-            continue;
-        }
-
-        int adjustedY = height - 1 - curY; // Adjust Y coordinate to start from bottom-left
-        int index = (adjustedY * width + curX) * channels;
-        int r = img.buf[index];
-        int g = img.buf[index + 1];
-        int b = img.buf[index + 2];
-
-        if (r >= boundary[0] && r <= boundary[1] && g >= boundary[2] && g <= boundary[3] && b >= boundary[4] && b <= boundary[5]) {
-            img.buf[index] = newColor[0];
-            img.buf[index + 1] = newColor[1];
-            img.buf[index + 2] = newColor[2];
-
-            visited[curY][curX] = true;
-
-            if (curX - 1 >= 0 && !visited[curY][curX - 1]) {
-                q.push({curX - 1, curY}); // Left
-            }
-            if (curX + 1 < width && !visited[curY][curX + 1]) {
-                q.push({curX + 1, curY}); // Right
-            }
-            if (curY - 1 >= 0 && !visited[curY - 1][curX]) {
-                q.push({curX, curY - 1}); // Up
-            }
-            if (curY + 1 < height && !visited[curY + 1][curX]) {
-                q.push({curX, curY + 1}); // Down
+        for (int y = region[1]; y < region[3]; ++y) {
+            for (int x = region[0]; x < region[2]; ++x) {
+                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
+                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
+                img.buf[index] = color[2];
+                img.buf[index + 1] = color[1]; 
+                img.buf[index + 2] = color[0]; 
             }
         }
-    }
+
 }
-
 
 
 int main() {
@@ -342,10 +346,8 @@ int main() {
 
     };
 
-
-
-    // Change color to white in whiteSquaresRegion
-    for (const auto& region : whiteSquaresRegion) {
+    // Change color to white in whiteSquaresRegion using multithreading
+    auto modifyColorWhite = [&](const std::vector<int>& region) {
         for (int y = region[1]; y < region[3]; ++y) {
             for (int x = region[0]; x < region[2]; ++x) {
                 int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
@@ -355,6 +357,18 @@ int main() {
                 img.buf[index + 2] = 255; // Set blue channel to 255 (white)
             }
         }
+    };
+
+    std::vector<std::thread> threadsForModifyWhite;
+    threadsForModifyWhite.emplace_back(modifyColorWhite, std::vector<int>{162, 240, 178, 258});
+    threadsForModifyWhite.emplace_back(modifyColorWhite, std::vector<int>{179, 225, 193, 239});
+    threadsForModifyWhite.emplace_back(modifyColorWhite, std::vector<int>{192, 210, 208, 224});
+    threadsForModifyWhite.emplace_back(modifyColorWhite, std::vector<int>{322, 242, 339, 258});
+    threadsForModifyWhite.emplace_back(modifyColorWhite, std::vector<int>{340, 226, 351, 240});
+    threadsForModifyWhite.emplace_back(modifyColorWhite, std::vector<int>{352, 211, 367, 224});
+
+    for (auto& thread : threadsForModifyWhite) {
+        thread.join();
     }
 
     // Check and change color to white if not black in diagonal1 region
@@ -487,6 +501,20 @@ int main() {
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{196, 406, 320, 432});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{200, 416, 302, 437});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{419, 204, 432, 229});
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{320, 274, 350, 285});
+
+    auto modifyRegion = [&](const std::vector<int> &region,const std::vector<int> &newColor){
+        for (int y = region[1]; y < region[3]; ++y) {
+            for (int x = region[0]; x < region[2]; ++x) {
+                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
+                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
+                img.buf[index] = newColor[2];
+                img.buf[index + 1] = newColor[1];
+                img.buf[index + 2] = newColor[0];
+            }
+        }
+    };
+
 
 
     for (auto& thread : threadsForModifySkin) {
@@ -509,6 +537,8 @@ int main() {
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 320, 432, bgColor, blueColor,20);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 429, 221, bgColor, lightBrownColor,1000);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 427, 204, bgColor, lightBrownColor,50);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 263, 447, bgColor, lightBrownColor,100);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 198, 432, bgColor, lightBrownColor,100);
 
 
 

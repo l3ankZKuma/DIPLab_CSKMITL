@@ -19,5 +19,8 @@
 #include<queue>
 #include<stack>
 #include<thread>
+#include <mutex>
+#include <cstdint>
+#include <iterator>
 
 #endif // PCH_H
