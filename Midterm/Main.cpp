@@ -200,7 +200,7 @@ int main() {
     changeColor(img, mouseRegion, lightBrownColor, mouseColorRange);
 
 
-    std::vector<int> mustacheRegion = {90, 277, 438, 420}; // Region for the mustache starting from bottom-left
+    std::vector<int> mustacheRegion = {90, 277, 438, 405}; // Region for the mustache starting from bottom-left
     std::vector<int> redColor = {255, 0, 0};
     std::vector<std::vector<int>> mustacheColorRange = {{0, 150}, {150,255}, {0, 150}}; // Example color range for the shirt
     std::reverse(redColor.begin(), redColor.end());
@@ -292,10 +292,11 @@ int main() {
         }
     }
 
+    
     //mustache
     std::vector<std::vector<int>> modifyRegions = {
-        {193, 332, 339, 403},
-        {230, 284, 273, 304}
+        {193, 332, 339, 400},
+        {230, 284, 273, 300}
     };
 
     // Change color to red in modifyRegions
