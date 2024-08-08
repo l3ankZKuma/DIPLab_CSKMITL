@@ -591,7 +591,7 @@ int main(){
    std::vector<std::thread> threadsForFloodFill;
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 124, 376, bgColor, redColor, 50);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 161, 387, bgColor, redColor, 50);
-    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 256, 318, redColor, lightBrownColor, 250);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 256, 318, redColor, lightBrownColor, 50);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 407, 358, lightBrownColor, redColor, 10000);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 416, 300, lightBrownColor, redColor, 200);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 245, 443, bgColor, blueColor, 1000);
