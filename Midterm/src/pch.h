@@ -22,5 +22,6 @@
 #include <mutex>
 #include <cstdint>
 #include <iterator>
+#include<functional>
 
 #endif // PCH_H

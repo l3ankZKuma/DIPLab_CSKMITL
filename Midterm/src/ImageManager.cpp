@@ -544,3 +544,4 @@ void ImageSystem::ResizeBilinear(Image& img, double scaleX, double scaleY) noexc
 
 
 template void ImageSystem::contraharmonicFilter<3>(Image& img,double Q) noexcept;
+template void ImageSystem::averagingFilter<3>(Image& img) noexcept;

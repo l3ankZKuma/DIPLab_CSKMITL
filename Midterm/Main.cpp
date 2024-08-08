@@ -159,27 +159,42 @@ void applyLaplacianFilter(Image& img) {
 
 
 // Function to change colors based on histogram ranges
-void changeColor(Image& img, const std::vector<int>& region, const std::vector<int>& targetColor, const std::vector<std::vector<int>>& colorRange,const std::vector<int>& notChangeColor={}) {
+void changeColor(Image& img, const std::vector<int>& region, const std::vector<int>& targetColor, const std::vector<std::vector<int>>& colorRange, const std::vector<int>& notChangeColor = {}) {
     int width = img.width;
     int height = img.height;
     int channels = img.bitDepth / BYTE; // Assuming 8-bit per channel
 
+    int targetR = targetColor[0];
+    int targetG = targetColor[1];
+    int targetB = targetColor[2];
+
+    int minR = colorRange[0][0];
+    int maxR = colorRange[0][1];
+    int minG = colorRange[1][0];
+    int maxG = colorRange[1][1];
+    int minB = colorRange[2][0];
+    int maxB = colorRange[2][1];
+
     for (int y = region[1]; y < region[3]; ++y) {
+        int adjustedY = height - 1 - y; // Adjust Y coordinate to start from bottom-left
+        int index = (adjustedY * width + region[0]) * channels;
+
         for (int x = region[0]; x < region[2]; ++x) {
-            int adjustedY = height - 1 - y; // Adjust Y coordinate to start from bottom-left
-            int index = (adjustedY * width + x) * channels;
             int r = img.buf[index];
             int g = img.buf[index + 1];
             int b = img.buf[index + 2];
-            if (r >= colorRange[0][0] && r <= colorRange[0][1] && g >= colorRange[1][0] && g <= colorRange[1][1] && b >= colorRange[2][0] && b <= colorRange[2][1]) {
-                img.buf[index] = targetColor[0];
-                img.buf[index + 1] = targetColor[1];
-                img.buf[index + 2] = targetColor[2];
+
+            [[likely]]
+            if (r >= minR && r <= maxR && g >= minG && g <= maxG && b >= minB && b <= maxB) {
+                img.buf[index] = targetR;
+                img.buf[index + 1] = targetG;
+                img.buf[index + 2] = targetB;
             }
+
+            index += channels;
         }
     }
-
-}  
+}
 
 
 void floodFill(Image& img, int x, int y, const std::vector<int>& targetColor, const std::vector<int>& fillColor, int maxFillCount) {
@@ -214,10 +229,18 @@ void floodFill(Image& img, int x, int y, const std::vector<int>& targetColor, co
 
             visited[curY][curX] = true;
 
-            q.push({curX - 1, curY}); // Left
-            q.push({curX + 1, curY}); // Right
-            q.push({curX, curY - 1}); // Up
-            q.push({curX, curY + 1}); // Down
+            if (curX > 0) {
+                q.push({curX - 1, curY}); // Left
+            }
+            if (curX < width - 1) {
+                q.push({curX + 1, curY}); // Right
+            }
+            if (curY > 0) {
+                q.push({curX, curY - 1}); // Up
+            }
+            if (curY < height - 1) {
+                q.push({curX, curY + 1}); // Down
+            }
         }
     }
 }
@@ -237,10 +260,74 @@ void modifyRegion(Image &img,const std::vector<int> & region,const std::vector<i
 
 }
 
+template<int size>
+void modifyPixels(Image &img) noexcept {
+    std::vector<uint8_t> tempBuf(img.width * img.height * 3);
+    int halfSize = size / 2;
 
-int main() {
+    for (int y = 0; y < img.height; ++y) {
+        for (int x = 0; x < img.width; ++x) {
+            std::vector<int> rValues, gValues, bValues;
+
+            for (int dy = -halfSize; dy <= halfSize; ++dy) {
+                for (int dx = -halfSize; dx <= halfSize; ++dx) {
+                    int nx = std::clamp(x + dx, 0, static_cast<int>(img.width) - 1);
+                    int ny = std::clamp(y + dy, 0, static_cast<int>(img.height) - 1);
+                    int color = ImageSystem::getRGB(img, nx, ny);
+                    
+                    rValues.push_back((color >> 16) & 0xFF);
+                    gValues.push_back((color >> 8) & 0xFF);
+                    bValues.push_back(color & 0xFF);
+                }
+            }
+
+            // Sort the color values
+            std::sort(rValues.begin(), rValues.end());
+            std::sort(gValues.begin(), gValues.end());
+            std::sort(bValues.begin(), bValues.end());
+
+            // Get the median values
+            int medianR = rValues[rValues.size() / 2];
+            int medianG = gValues[gValues.size() / 2];
+            int medianB = bValues[bValues.size() / 2];
+
+            // Get the center pixel color
+            int centerColor = ImageSystem::getRGB(img, x, y);
+            int centerR = (centerColor >> 16) & 0xFF;
+            int centerG = (centerColor >> 8) & 0xFF;
+            int centerB = centerColor & 0xFF;
+
+            // If the center pixel is different from the median, replace it
+            if (centerR != medianR || centerG != medianG || centerB != medianB) {
+                int newColor = (medianR << 16) | (medianG << 8) | medianB;
+                int index = (y * img.width + x) * 3;
+                tempBuf[index] = medianR;
+                tempBuf[index + 1] = medianG;
+                tempBuf[index + 2] = medianB;
+            } else {
+                // Keep the original color
+                int index = (y * img.width + x) * 3;
+                tempBuf[index] = centerR;
+                tempBuf[index + 1] = centerG;
+                tempBuf[index + 2] = centerB;
+            }
+        }
+    }
+
+    // Copy the modified pixels back to the original image
+    std::copy(tempBuf.begin(), tempBuf.end(), img.buf);
+}
+
+
+int main(){
+
     std::string inputFileName = PATH_IMAGES "gamemaster_noise_2024.bmp";
     std::string outputFileName = PATH_IMAGES "restored_image.bmp";
+
+
+    //Color
+    const std::vector<int> whiteColor = {255, 255, 255};
+    const std::vector<int> blackColor = {0, 0, 0};
 
     Image img;
     ImageSystem::initImage(img);
@@ -264,6 +351,11 @@ int main() {
     // Apply adaptive median filter
     for (int i = 0; i < (1 << 5); ++i) {
         adaptiveMedianFilter<7>(img);
+    }
+
+    // Apply adaptive median filter
+    for (int i = 0; i < (1 << 5); ++i) {
+        adaptiveMedianFilter<9>(img);
     }
 
     
@@ -329,22 +421,8 @@ int main() {
     std::vector<std::vector<int>> glassColorRange = {{0, 150}, {0,150}, {0,150}}; // Example color range for the shirt
     changeColor(img, glassRegion, glassColor, glassColorRange);
 
-    //diagonal 1,2
-    std::vector<int> diagonal1Region = {153, 200, 212, 255}; // Region for the diagonal1 starting from bottom-left
-    std::vector<int> diagonal2Region = {314,204, 366, 255}; // Region for the diagonal2 starting from bottom-left
-    std::vector<int> diagonalColor = {255, 255, 255};
+ 
 
-
-    std::vector<std::vector<int>> whiteSquaresRegion =
-    {
-        {162,240,178,258},
-        {179,225,193,239},
-        {192,210,208,224},
-        {322,242,339,258},
-        {340,226,351,240},
-        {352,211,367,224}
-
-    };
 
     // Change color to white in whiteSquaresRegion using multithreading
     auto modifyColorWhite = [&](const std::vector<int>& region) {
@@ -371,36 +449,32 @@ int main() {
         thread.join();
     }
 
-    // Check and change color to white if not black in diagonal1 region
-    for (int y = diagonal1Region[1]; y < diagonal1Region[3]; ++y) {
-        for (int x = diagonal1Region[0]; x < diagonal1Region[2]; ++x) {
-            int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
-            int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
-            int r = img.buf[index];
-            int g = img.buf[index + 1];
-            int b = img.buf[index + 2];
-            if (r != 0 || g != 0 || b != 0) {
-                img.buf[index] = diagonalColor[0];
-                img.buf[index + 1] = diagonalColor[1];
-                img.buf[index + 2] = diagonalColor[2];
-            }
-        }
-    }
 
-    // Check and change color to white if not black in diagonal2 region
-    for (int y = diagonal2Region[1]; y < diagonal2Region[3]; ++y) {
-        for (int x = diagonal2Region[0]; x < diagonal2Region[2]; ++x) {
-            int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
-            int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
-            int r = img.buf[index];
-            int g = img.buf[index + 1];
-            int b = img.buf[index + 2];
-            if (r != 0 || g != 0 || b != 0) {
-                img.buf[index] = diagonalColor[0];
-                img.buf[index + 1] = diagonalColor[1];
-                img.buf[index + 2] = diagonalColor[2];
+
+    // Check and change color to white if not black in diagonal1 region
+    auto modifyColorDiagonal = [&](const std::vector<int>& region) {
+        for (int y = region[1]; y < region[3]; ++y) {
+            for (int x = region[0]; x < region[2]; ++x) {
+                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
+                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
+                int r = img.buf[index];
+                int g = img.buf[index + 1];
+                int b = img.buf[index + 2];
+                if (r != 0 || g != 0 || b != 0) {
+                    img.buf[index] = whiteColor[0];
+                    img.buf[index + 1] = whiteColor[1];
+                    img.buf[index + 2] = whiteColor[2];
+                }
             }
         }
+    };
+
+    std::vector<std::thread> threadsForModifyDiagonal;
+    threadsForModifyDiagonal.emplace_back(modifyColorDiagonal, std::vector<int>{153, 200, 212, 255});
+    threadsForModifyDiagonal.emplace_back(modifyColorDiagonal, std::vector<int>{314,204, 366, 255});
+
+    for (auto& thread : threadsForModifyDiagonal) {
+        thread.join();
     }
 
     
@@ -411,8 +485,8 @@ int main() {
     uniqueColors.insert(lightBrownColor);
     uniqueColors.insert(redColor);
     uniqueColors.insert(blueColor);
-    uniqueColors.insert({0,0,0});
-    uniqueColors.insert({255,255,255});
+    uniqueColors.insert(blackColor);
+    uniqueColors.insert(whiteColor);
 
     
     for(int i=0;i<512;++i){
@@ -496,23 +570,13 @@ int main() {
         }
     };
 
+
     std::vector<std::thread> threadsForModifySkin;
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{93, 124, 416, 332});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{196, 406, 320, 432});
     threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{200, 416, 302, 437});
-    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{328, 275, 344, 300});
+    threadsForModifySkin.emplace_back(modifyColorSkin, std::vector<int>{422, 211, 433, 243});
 
-    auto modifyRegion = [&](const std::vector<int> &region,const std::vector<int> &newColor){
-        for (int y = region[1]; y < region[3]; ++y) {
-            for (int x = region[0]; x < region[2]; ++x) {
-                int adjustedY = img.height - 1 - y; // Adjust Y coordinate to start from bottom-left
-                int index = (adjustedY * img.width + x) * img.bitDepth / BYTE;
-                img.buf[index] = newColor[2];
-                img.buf[index + 1] = newColor[1];
-                img.buf[index + 2] = newColor[0];
-            }
-        }
-    };
 
 
 
@@ -544,6 +608,40 @@ int main() {
     for(auto& thread: threadsForFloodFill){
         thread.join();
     }
+
+
+
+
+    for(size_t i=0 ;i < (1<<6);++i){
+        modifyPixels<3>(img);
+    }
+
+
+
+
+
+
+    
+    for(int i=0;i<512;++i){
+        for(int j=0;j<512;++j){
+            int index = (i * 512 + j) * 3;
+            std::vector<int> color = {img.buf[index], img.buf[index+1], img.buf[index+2]};
+            if(uniqueColors.find(color) == uniqueColors.end()){
+                img.buf[index] = redColor[0];
+                img.buf[index+1] = redColor[1];
+                img.buf[index+2] = redColor[2];
+        }
+        }
+    }
+
+    std::vector<std::vector<int>> redColorRange = {{255, 255}, {0, 0}, {0, 0}};
+    std::vector<int> redRegion = {54,426,454,509};
+    std::reverse(redColor.begin(), redColor.end());
+    std::reverse(redColorRange.begin(), redColorRange.end());
+    changeColor(img, redRegion, redColor, redColorRange);
+
+
+
 
 
 
