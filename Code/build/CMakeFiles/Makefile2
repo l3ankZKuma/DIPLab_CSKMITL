@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all:
+all: CMakeFiles/Prog.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,8 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean:
+clean: CMakeFiles/Prog.dir/clean
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Prog.dir
+
+# All Build rule for target.
+CMakeFiles/Prog.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prog.dir/build.make CMakeFiles/Prog.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prog.dir/build.make CMakeFiles/Prog.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles --progress-num=1,2,3,4 "Built target Prog"
+.PHONY : CMakeFiles/Prog.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Prog.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Prog.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles 0
+.PHONY : CMakeFiles/Prog.dir/rule
+
+# Convenience name for target.
+Prog: CMakeFiles/Prog.dir/rule
+.PHONY : Prog
+
+# clean rule for target.
+CMakeFiles/Prog.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prog.dir/build.make CMakeFiles/Prog.dir/clean
+.PHONY : CMakeFiles/Prog.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

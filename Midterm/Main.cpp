@@ -603,6 +603,7 @@ int main(){
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 263, 447, bgColor, lightBrownColor,100);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 198, 432, bgColor, lightBrownColor,100);
     threadsForFloodFill.emplace_back(floodFill, std::ref(img), 96, 325, lightBrownColor, redColor,100);
+    threadsForFloodFill.emplace_back(floodFill, std::ref(img), 417, 201, bgColor ,std::vector<int>{0,0,0},50);
 
 
 

@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xclang -emit-pch -Xclang -include -Xclang /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles/Prog.dir/cmake_pch_arm64.hxx -x c++-header -o CMakeFiles/Prog.dir/cmake_pch_arm64.hxx.pch -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles/Prog.dir/cmake_pch_arm64.hxx.cxx",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles/Prog.dir/cmake_pch_arm64.hxx.cxx",
+  "output": "CMakeFiles/Prog.dir/cmake_pch_arm64.hxx.pch"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles/Prog.dir/cmake_pch_arm64.hxx -o CMakeFiles/Prog.dir/Main.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/Main.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/Main.cpp",
+  "output": "CMakeFiles/Prog.dir/Main.cpp.o"
+},
+{
+  "directory": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -DIMAGES_DIR=\\\"/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/images\\\" -I/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/src -g -std=gnu++2b -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -O3 -march=native -mtune=native -Winvalid-pch -Xarch_arm64 -include/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/build/CMakeFiles/Prog.dir/cmake_pch_arm64.hxx -o CMakeFiles/Prog.dir/src/ImageManager.cpp.o -c /Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/src/ImageManager.cpp",
+  "file": "/Users/bankzkuma/Desktop/CSKMITL/DIP/Lab/Code/src/ImageManager.cpp",
+  "output": "CMakeFiles/Prog.dir/src/ImageManager.cpp.o"
+}
+]
